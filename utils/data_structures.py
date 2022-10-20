@@ -23,6 +23,9 @@ class OutputData:
         self.n_topics += 1
         self.topics.append(Topic(words, word_scores, frequency, name, number_type))
 
+    def get_topics(self):
+        return [topic.words for topic in self.topics]
+
     def __repr__(self) -> str:
         n_display = min(3, self.n_topics)
         n_skipped = self.n_topics - n_display
@@ -49,7 +52,7 @@ class Topic:
     def __repr__(self) -> str:
         ret_string = "<\n"
         for i in range(self.length):
-                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]) + "\n")
+                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]))
         return ret_string + "\n>"
 
     def get_words(self):
