@@ -19,6 +19,7 @@ class LDAModel(Model):
 
     def fit(self, data):
         super().fit(data)
+        self.data = data
         self.dictionary = Dictionary(data.texts)
         self.dictionary.filter_extremes(**self.parameters["filter_extremes"])
         corpus = [self.dictionary.doc2bow(text) for text in data.texts]
@@ -26,11 +27,13 @@ class LDAModel(Model):
         self.model = lda
 
     def get_topics(self):
-        topics = self.model.show_topics()
+        output = OutputData(self.data)
 
-        output = OutputData()
         for i in range(0, self.model.num_topics):
-           output.add_topic([(self.dictionary[token], score) for (token, score) in self.model.get_topic_terms(i, topn=10)])
+           words = [self.dictionary[token] for (token, score) in self.model.get_topic_terms(i, topn=10)]
+           word_scores = [score for (token, score) in self.model.get_topic_terms(i, topn=10)]
+           frequency = 0
+           output.add_topic(words, word_scores, frequency)
 
         return output
     

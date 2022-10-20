@@ -18,16 +18,18 @@ class BERTopicModel(Model):
 
     def fit(self, data):
         super().fit(data)
+        self.data = data
         bert = BERTopic(**self.parameters["bertopic"])
         bert.fit_transform([" ".join(doc) for doc in data.texts])
         self.model = bert
 
     def get_topics(self):
-        output = OutputData()
-
+        output = OutputData(self.data)
         for i in range(0, len(self.model.get_topics())-1):
-            output.add_topic(self.model.get_topic(i))
-
+            words = [word for (word, score) in self.model.get_topic(i)]
+            word_scores = [score for (word, score) in self.model.get_topic(i)]
+            frequency = self.model.get_topic_freq(i)
+            output.add_topic(words, word_scores, frequency)
         return output
     
     def init_default_parameters(self):
