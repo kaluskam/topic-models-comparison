@@ -2,7 +2,7 @@ import pandas as pd
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from model import Model
+from models.model import Model
 from utils.data_structures import OutputData
 
 

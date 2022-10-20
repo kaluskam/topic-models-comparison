@@ -4,7 +4,7 @@ import re
 import nltk
 import copy
 
-from data_structures import InputData
+from utils.data_structures import InputData
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -15,7 +15,7 @@ nltk.download('wordnet')
 nltk.download('omw-1.4')
 
 STOP_WORDS = stopwords.words('english')
-PUNCTUATION = list(string.punctuation)
+PUNCTUATION = list(string.punctuation) + ["\"\"", "``", "\'\'"]
 STOP_WORDS_PUNCT = set(STOP_WORDS + PUNCTUATION)
 
 
@@ -38,13 +38,13 @@ class DataPreprocessor:
         return df_copy
 
     def preprocess_text(self, text):
-        words = word_tokenize(text.lower())
+        words = contractions.fix(text.lower())
+        words = word_tokenize(words)
         if self.stem:
             words = [SnowballStemmer('english').stem(word) for word in words]
         if self.lematize:
             words = [WordNetLemmatizer().lemmatize(word) for word in words]
 
-        words = DataPreprocessor.expand_contractions(words)
         words = DataPreprocessor.remove_stop_words_and_punctuation(words)
         words = DataPreprocessor.remove_digits(words)
         return self.remove_short_words(words)
