@@ -162,3 +162,4 @@ dmypy.json
 cython_debug/
 
 data/aita_df.csv
+.vscode
