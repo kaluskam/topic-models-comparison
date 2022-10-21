@@ -42,12 +42,14 @@ def create_topics(datamodel):
     return [create_nmf_topics(datamodel), create_lda_topics(datamodel), create_bert_topics(datamodel)]
 
 if __name__ == "__main__":
-    from utils.data_structures import *
+    import streamlit as st
+
+    from utils.data_structures import InputData
     from models.nmf_model import NMFModel
     from models.lda_model import LDAModel
     from models.berttopic_model import BERTopicModel
     from utils.preprocessing import DataPreprocessor 
-    from metrics.coherence_metric import *
+    from metrics.coherence_metric import CNPMICoherenceMetric, CUCICoherenceMetric, CVCoherenceMetric, UMassCoherenceMetric
 
     import pandas as pd
 
@@ -59,4 +61,5 @@ if __name__ == "__main__":
         columns = ["umass", "cv", "cuci", "cnpmi"],
         index = ["NMF", "LDA", "BERTopic"])
 
-    print(results)
+    st.table(results)
+

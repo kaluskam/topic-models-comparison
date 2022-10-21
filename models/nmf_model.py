@@ -1,8 +1,9 @@
 import pandas as pd
+import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from model import Model
+from models.model import Model
 from utils.data_structures import OutputData
 
 
@@ -19,18 +20,24 @@ class NMFModel(Model):
 
     def fit(self, data):
         super().fit(data)
+        self.data = data
         tfidf = self.tfidf_vectorizer.fit_transform(data.texts)
         self.model = NMF(**self.parameters['nmf'])
-        self.model.fit_transform(tfidf)
+        self.H = self.model.fit_transform(tfidf)
 
     def get_topics(self):
         components_df = pd.DataFrame(self.model.components_,
                                      columns=self.tfidf_vectorizer.get_feature_names_out())
-        output = OutputData()
+        output = OutputData(self.data)
+
+        frequencies = np.sum(self.H, axis=1)
+        frequencies /= np.sum(frequencies)
+
         for topic in range(components_df.shape[0]):
             tmp = components_df.iloc[topic]
-            top = [(ind, tmp[ind]) for ind in tmp.nlargest(10).index]
-            output.add_topic(top)
+            words = [ind for ind in tmp.nlargest(10).index]
+            word_scores = [tmp[ind] for ind in tmp.nlargest(10).index]
+            output.add_topic(words, word_scores, frequencies[topic])
 
         return output
 
