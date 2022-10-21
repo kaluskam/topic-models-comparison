@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 from models.model import Model
 from utils.data_structures import OutputData
@@ -29,10 +30,14 @@ class LDAModel(Model):
     def get_topics(self):
         output = OutputData(self.data)
 
+        topic_distribution = self.model.get_topics()
+        frequencies = np.sum(topic_distribution, axis=0)
+        frequencies /= np.sum(frequencies)
+
         for i in range(0, self.model.num_topics):
            words = [self.dictionary[token] for (token, score) in self.model.get_topic_terms(i, topn=10)]
            word_scores = [score for (token, score) in self.model.get_topic_terms(i, topn=10)]
-           frequency = 0
+           frequency = frequencies[i]
            output.add_topic(words, word_scores, frequency)
 
         return output
