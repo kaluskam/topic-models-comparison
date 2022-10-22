@@ -4,24 +4,24 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from umap import UMAP
 
+
 class Visualizer:
-    def __init__(self, parameters = None):
+    def __init__(self, parameters=None):
         self.parameters = parameters
         if parameters is None:
             self.init_default_parameters()
-        
+
         pass
 
     def visualize_words_in_topic(self, topic):
-        
-        topics_df = pd.DataFrame({"words": topic.words, "scores": topic.word_scores})
+        topics_df = pd.DataFrame(
+            {"words": topic.words, "scores": topic.word_scores})
         fig = px.bar(topics_df, x="scores", y="words")
         fig.update_layout(yaxis=dict(autorange="reversed"))
-        
+
         return fig
-    
+
     def visualize_topics_in_documents(self, inputData, outputData):
-        
         self.tfidf = TfidfVectorizer(**self.parameters["tfidf"])
         self.tfidf.fit(inputData.texts)
         topics = [topic.words for topic in outputData.topics]
@@ -31,10 +31,10 @@ class Visualizer:
         embeddings = self.tfidf.transform(topics).toarray()
         embeddings = MinMaxScaler().fit_transform(embeddings)
         embeddings = UMAP(**self.parameters["umap"]).fit_transform(embeddings)
-        
+
         df = pd.DataFrame({"x": embeddings[:, 0],
                            "y": embeddings[:, 1],
-                           "Texts": texts, 
+                           "Texts": texts,
                            "Topic": topic_names,
                            "Size": frequencies})
 
@@ -51,7 +51,6 @@ class Visualizer:
                                      "x": False,
                                      "y": False})
         return fig
-
 
     def init_default_parameters(self):
         self.parameters = {"tfidf": {'preprocessor': ' '.join},

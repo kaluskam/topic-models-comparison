@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.decomposition import NMF
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from models.model import Model
+from .model import Model
 from utils.data_structures import OutputData
 
 

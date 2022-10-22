@@ -7,11 +7,11 @@ from gensim.corpora.dictionary import Dictionary
 
 class UMassCoherenceMetric(Metric):
 
-    def __init__(self, flag = False, range = (-14,14), parameters = None):
+    def __init__(self, flag=False, range=(-14, 14), parameters=None):
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
-    
+
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
         topics = outputData.get_topics()
@@ -19,23 +19,24 @@ class UMassCoherenceMetric(Metric):
         corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
 
         cm = CoherenceModel(topics=topics,
-                            texts = inputData.texts,
+                            texts=inputData.texts,
                             dictionary=dictionary,
-                            corpus = corpus,
-                            coherence = "u_mass",
+                            corpus=corpus,
+                            coherence="u_mass",
                             **self.parameters["coherencemodel"])
         return cm.get_coherence()
 
     def init_default_parameters(self):
         self.parameters = {"coherencemodel": {}}
+
 
 class CVCoherenceMetric(Metric):
 
-    def __init__(self, flag = True, range = (0,1), parameters = None):
+    def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
-    
+
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
         topics = outputData.get_topics()
@@ -43,23 +44,24 @@ class CVCoherenceMetric(Metric):
         corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
 
         cm = CoherenceModel(topics=topics,
-                            texts = inputData.texts,
+                            texts=inputData.texts,
                             dictionary=dictionary,
-                            corpus = corpus,
-                            coherence = "c_v",
+                            corpus=corpus,
+                            coherence="c_v",
                             **self.parameters["coherencemodel"])
         return cm.get_coherence()
 
     def init_default_parameters(self):
         self.parameters = {"coherencemodel": {}}
+
 
 class CUCICoherenceMetric(Metric):
 
-    def __init__(self, flag = True, range = (-1,1), parameters = None):
+    def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
-    
+
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
         topics = outputData.get_topics()
@@ -67,23 +69,24 @@ class CUCICoherenceMetric(Metric):
         corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
 
         cm = CoherenceModel(topics=topics,
-                            texts = inputData.texts,
+                            texts=inputData.texts,
                             dictionary=dictionary,
-                            corpus = corpus,
-                            coherence = "c_uci",
+                            corpus=corpus,
+                            coherence="c_uci",
                             **self.parameters["coherencemodel"])
         return cm.get_coherence()
 
     def init_default_parameters(self):
         self.parameters = {"coherencemodel": {}}
 
+
 class CNPMICoherenceMetric(Metric):
 
-    def __init__(self, flag = True, range = (-1,1), parameters = None):
+    def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
-    
+
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
         topics = outputData.get_topics()
@@ -91,10 +94,10 @@ class CNPMICoherenceMetric(Metric):
         corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
 
         cm = CoherenceModel(topics=topics,
-                            texts = inputData.texts,
+                            texts=inputData.texts,
                             dictionary=dictionary,
-                            corpus = corpus,
-                            coherence = "c_npmi",
+                            corpus=corpus,
+                            coherence="c_npmi",
                             **self.parameters["coherencemodel"])
         return cm.get_coherence()
 
