@@ -1,1 +1,0 @@
-# Script downloading data from given subreddits
