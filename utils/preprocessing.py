@@ -31,7 +31,15 @@ class DataPreprocessor:
         else:
             df_copy = copy.deepcopy(df)
 
-        df_copy[text_column] = df_copy[text_column].apply(lambda text: text if type(text) == str else '')
+        if type(text_column) == list and len(text_column) != 1:
+            df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
+            for i in range(len(text_column) - 1):
+                df_copy[text_column[i+1]] = df_copy[text_column[i+1]].apply(lambda text: text if type(text) == str else '')
+                df_copy.loc[:, text_column[0]] = df_copy.loc[:, text_column[0]] + " " + df_copy.loc[:, text_column[i + 1]]
+                text_column = text_column[0]
+        elif type(text_column) == list and len(text_column) == 1:
+            text_column = text_column[0]
+
         df_copy[dest_column] = df_copy[text_column].apply(lambda text: self.preprocess_text(text))
         if remove_empty_rows:
             df_copy = df_copy[df_copy[dest_column] != '']
