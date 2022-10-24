@@ -1,2 +1,0 @@
-Directory contains scripts, which run downloading and preprocessing for data,
-as well as topic modelling and model evaluation.

@@ -7,6 +7,7 @@ from utils.data_structures import OutputData
 from gensim.corpora.dictionary import Dictionary
 from gensim.models.ldamodel import LdaModel
 
+
 class LDAModel(Model):
     """
     Brzydka i niekompletna wstępna implemetacja przykładowego modelu.
@@ -16,7 +17,6 @@ class LDAModel(Model):
         super().__init__(parameters)
         if parameters is None:
             self.init_default_parameters()
-
 
     def fit(self, data):
         super().fit(data)
