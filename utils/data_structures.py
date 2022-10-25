@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 class InputData:
     """
     Model danych wejściowych do modelu
@@ -14,17 +17,23 @@ class OutputData:
     Model danych wynikowych z modelu
     """
     def __init__(self, documents):
-        self.texts_topics = None # obiekt, który zawiera teksty i odpowiadające im indeksy tematów
+        self.texts_topics = pd.DataFrame({'text_id': [], 'topic_id': []})
         self.documents = documents
         self.topics = []
+        self.topics_dict = {}
         self.n_topics = 0
 
-    def add_topic(self, words, word_scores, frequency, name = "", number_type = None):
+    def add_topic(self, words, word_scores, frequency, name="", number_type=None):
         self.n_topics += 1
         self.topics.append(Topic(words, word_scores, frequency, name, number_type))
+        self.topics_dict[self.n_topics - 1] = Topic(words, word_scores, frequency, name, number_type)
 
     def get_topics(self):
         return [topic.words for topic in self.topics]
+
+    def add_texts_topics(self, text_ids, topic_ids):
+        self.texts_topics['text_id'] = text_ids
+        self.texts_topics['topic_id'] = topic_ids
 
     def __repr__(self) -> str:
         n_display = min(3, self.n_topics)
@@ -36,12 +45,13 @@ class OutputData:
             ret_string += "\n"
         return ret_string + "... skipped " + str(n_skipped) + " topics"
 
+
 class Topic:
     """
     an object storing an individual topic
     """
 
-    def __init__(self, words, word_scores, frequency, name = "", number_type = None):
+    def __init__(self, words, word_scores, frequency, name="", number_type=None):
         assert len(words) == len(word_scores)
         self.length = len(words)
         self.words = words

@@ -17,33 +17,41 @@ class NMFModel(Model):
         if parameters is None:
             self.init_default_parameters()
         self.tfidf_vectorizer = TfidfVectorizer(**self.parameters['tfidf'])
+        self.output = None
 
     def fit(self, data):
         super().fit(data)
         self.data = data
         tfidf = self.tfidf_vectorizer.fit_transform(data.texts)
         self.model = NMF(**self.parameters['nmf'])
-        self.H = self.model.fit_transform(tfidf)
+        self.W = self.model.fit_transform(tfidf)
+        self.H = self.model.components_
 
     def get_topics(self):
         components_df = pd.DataFrame(self.model.components_,
                                      columns=self.tfidf_vectorizer.get_feature_names_out())
-        output = OutputData(self.data)
+        self.output = OutputData(self.data)
 
-        frequencies = np.sum(self.H, axis=1)
+        frequencies = np.sum(self.W, axis=1)
         frequencies /= np.sum(frequencies)
 
         for topic in range(components_df.shape[0]):
             tmp = components_df.iloc[topic]
             words = [ind for ind in tmp.nlargest(10).index]
             word_scores = [tmp[ind] for ind in tmp.nlargest(10).index]
-            output.add_topic(words, word_scores, frequencies[topic])
+            self.output.add_topic(words, word_scores, frequencies[topic])
 
-        return output
+        return self.output
+
+    def match_texts_with_topics(self):
+        print(self.W.shape)
+        text_ids = np.arange(1, len(self.data.texts) + 1)
+        topic_ids = np.argmax(self.W, axis=1)
+        self.output.add_texts_topics(text_ids, topic_ids)
 
     def choose_number_of_topics(self):
         pass
 
     def init_default_parameters(self):
         self.parameters = {'tfidf': {'preprocessor': ' '.join},
-                           'nmf': {'n_components': 10}}
+                           'nmf': {'n_components': 5}}

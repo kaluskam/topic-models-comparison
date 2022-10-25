@@ -7,7 +7,7 @@ def create_metrics():
 
 
 def load_data():
-    df = pd.read_csv("..\\data\\aita_df.csv")
+    df = pd.read_csv("..\\data\\askmen_df.csv")
     dp = DataPreprocessor(True, False)
     text_df = dp.preprocess_dataframe(df.loc[1:100, ], "selftext",
                                       "processed_text", True)
