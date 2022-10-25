@@ -24,9 +24,10 @@ class OutputData:
         self.n_topics = 0
 
     def add_topic(self, words, word_scores, frequency, name="", number_type=None):
+        new_topic = Topic(words, word_scores, frequency, name, number_type)
+        self.topics.append(new_topic)
+        self.topics_dict[self.n_topics] = new_topic
         self.n_topics += 1
-        self.topics.append(Topic(words, word_scores, frequency, name, number_type))
-        self.topics_dict[self.n_topics - 1] = Topic(words, word_scores, frequency, name, number_type)
 
     def get_topics(self):
         return [topic.words for topic in self.topics]

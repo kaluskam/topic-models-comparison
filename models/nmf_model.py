@@ -8,9 +8,6 @@ from utils.data_structures import OutputData
 
 
 class NMFModel(Model):
-    """
-    Brzydka i niekompletna wstępna implemetacja przykładowego modelu.
-    """
 
     def __init__(self, parameters=None):
         super().__init__(parameters)
@@ -27,7 +24,7 @@ class NMFModel(Model):
         self.W = self.model.fit_transform(tfidf)
         self.H = self.model.components_
 
-    def get_topics(self):
+    def get_output(self):
         components_df = pd.DataFrame(self.model.components_,
                                      columns=self.tfidf_vectorizer.get_feature_names_out())
         self.output = OutputData(self.data)
@@ -41,10 +38,11 @@ class NMFModel(Model):
             word_scores = [tmp[ind] for ind in tmp.nlargest(10).index]
             self.output.add_topic(words, word_scores, frequencies[topic])
 
+        self._match_texts_with_topics()
+
         return self.output
 
-    def match_texts_with_topics(self):
-        print(self.W.shape)
+    def _match_texts_with_topics(self):
         text_ids = np.arange(1, len(self.data.texts) + 1)
         topic_ids = np.argmax(self.W, axis=1)
         self.output.add_texts_topics(text_ids, topic_ids)

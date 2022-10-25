@@ -86,7 +86,8 @@ def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
                   labels={
                       'topic_id': 'Topic number',
                       'topic': 'Topic'
-                  }, hover_data={'topic': True})
+                  },
+                  hover_data={'topic': True})
     fig.update_traces(marker={'size': 12})
     # opcjonalne formatowanie daty
     # fig.update_xaxes(
