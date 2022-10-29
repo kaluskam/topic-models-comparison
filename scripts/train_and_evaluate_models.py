@@ -7,7 +7,7 @@ def create_metrics():
 
 
 def load_data():
-    df = pd.read_csv("..\\data\\aita_df.csv")
+    df = pd.read_csv("..\\data\\askmen_df.csv")
     dp = DataPreprocessor(True, False)
     text_df = dp.preprocess_dataframe(df.loc[1:100, ], "selftext",
                                       "processed_text", True)
@@ -19,21 +19,21 @@ def load_data():
 def create_nmf_topics(datamodel):
     nmf = NMFModel()
     nmf.fit(datamodel)
-    nmf_topics = nmf.get_topics()
+    nmf_topics = nmf.get_output()
     return nmf_topics
 
 
 def create_lda_topics(datamodel):
     lda = LDAModel()
     lda.fit(datamodel)
-    lda_topics = lda.get_topics()
+    lda_topics = lda.get_output()
     return lda_topics
 
 
 def create_bert_topics(datamodel):
     bert = BERTopicModel()
     bert.fit(datamodel)
-    bert_topics = bert.get_topics()
+    bert_topics = bert.get_output()
     return bert_topics
 
 
