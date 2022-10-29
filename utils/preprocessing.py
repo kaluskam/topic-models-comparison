@@ -3,8 +3,9 @@ import contractions
 import re
 import nltk
 import copy
-
+import pandas as pd
 from utils.data_structures import InputData
+import os
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -31,16 +32,15 @@ class DataPreprocessor:
         else:
             df_copy = copy.deepcopy(df)
 
-        if type(text_column) == list and len(text_column) != 1:
-            df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
-            for i in range(len(text_column) - 1):
-                df_copy[text_column[i+1]] = df_copy[text_column[i+1]].apply(lambda text: text if type(text) == str else '')
-                df_copy.loc[:, text_column[0]] = df_copy.loc[:, text_column[0]] + " " + df_copy.loc[:, text_column[i + 1]]
-                text_column = text_column[0]
-        elif type(text_column) == list and len(text_column) == 1:
-            text_column = text_column[0]
+        if type(text_column) == str:
+            text_column = [text_column]
 
-        df_copy[dest_column] = df_copy[text_column].apply(lambda text: self.preprocess_text(text))
+        df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
+        initial_text = df_copy[text_column[0]]
+        if type(text_column) == list and len(text_column) != 1:
+            initial_text = self.paste_columns(df_copy, text_column)
+
+        df_copy[dest_column] = initial_text.apply(lambda text: self.preprocess_text(text)) #df_copy[text_column[0]]
         if remove_empty_rows:
             df_copy = df_copy[df_copy[dest_column] != '']
         return df_copy
@@ -59,6 +59,28 @@ class DataPreprocessor:
 
     def remove_short_words(self, words):
         return [word for word in words if len(word) >= self.min_word_len]
+
+    def paste_columns(self, df_copy, text_column):
+        initial_text = df_copy[text_column[0]]
+        for i in range(len(text_column) - 1):
+            df_copy[text_column[i + 1]] = df_copy[text_column[i + 1]].apply(
+                lambda text: text if type(text) == str else '')
+            next_text = df_copy[text_column[i + 1]]
+            initial_text = initial_text + " " + next_text
+        return initial_text
+
+    def read_data(self, subreddit):
+        file = subreddit.lower()
+        df = pd.read_csv('../data/raw/' + file + '.csv')
+        return df
+
+    def save_data(self, df, subreddit):
+        path = "../data/preprocessed/"
+        if not os.path.exists(path):
+            os.mkdir(path)
+        df.to_csv(path + subreddit.lower() + '.csv', index=False)
+        return
+
 
     @staticmethod
     def to_InputDataModel(df, text_column):

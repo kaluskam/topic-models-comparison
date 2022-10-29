@@ -1,28 +1,20 @@
 from utils.preprocessing import DataPreprocessor
-import pandas as pd
-import pickle
-
-filenames = ['askmen', 'askwomen', 'amitheasshole']
 
 
-def read_data(files):
-    df_dict = {}
-    for file in files:
-        df_dict[file] = pd.read_csv('../data/' + file + '.csv')
-    return df_dict
+def preprocess_data(subreddits, columns_df):
+    preprocessor_lem = DataPreprocessor(lematize=True, stem=False)
+    preprocessor_stem = DataPreprocessor()
 
-df_dict = read_data(filenames)
-preprocessor = DataPreprocessor(lematize=True, stem=False)
-preprocessor_stem = DataPreprocessor()
+    for subreddit in zip(subreddits, columns_df):
+        df = preprocessor_lem.read_data(subreddit[0])
+        df_lem = preprocessor_lem.preprocess_dataframe(df, text_column=subreddit[1],
+                                                       dest_column='lematized', remove_empty_rows=True)
+        df_stem = preprocessor_stem.preprocess_dataframe(df_lem, text_column=subreddit[1],
+                                                         dest_column='stemmed', remove_empty_rows=True)
+        processed_df = df_stem.loc[:, ['lematized', 'stemmed', 'date']]
+        preprocessor_lem.save_data(processed_df, subreddit[0])
 
-preprocessed_df = {}
-preprocessed_df['askmen'] = preprocessor.preprocess_dataframe(df_dict['askmen'], text_column=['title', 'text'],
-                                                   dest_column='processed_text', remove_empty_rows=True)
-preprocessed_df['askwomen'] = preprocessor.preprocess_dataframe(df_dict['askwomen'], text_column=['title', 'text'],
-                                                     dest_column='processed_text', remove_empty_rows=True)
-preprocessed_df['amitheasshole'] = preprocessor.preprocess_dataframe(df_dict['amitheasshole'], text_column='text',
-                                                   dest_column='processed_text', remove_empty_rows=True)
+subreddits = ['AskMen', 'AskWomen', 'AmITheAsshole']
+columns_df = [['title', 'text'], ['title', 'text'], ['text']]
 
-with open('../data/preprocessed_text.pkl', 'wb') as f:
-    pickle.dump(preprocessed_df, f)
-
+preprocess_data(subreddits, columns_df)

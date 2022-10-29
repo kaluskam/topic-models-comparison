@@ -1,5 +1,6 @@
 import pandas as pd
 import praw
+import os
 from psaw import PushshiftAPI
 import datetime as dt
 import warnings
@@ -53,12 +54,15 @@ class DataDownloader:
             aita_df.created = aita_df.created.apply(lambda x: str(dt.date.fromtimestamp(x)))
         aita_df = aita_df.reset_index(drop=True)
         aita_df = aita_df.rename(columns={"selftext": "text", "created": "date"})
+        path = "../data/raw/"
+        if not os.path.exists(path):
+            os.mkdir(path)
 
         if saveas and type(saveas) == str:
-            name = "../data/" + saveas + ".csv"
+            name = "../data/raw/" + saveas + ".csv"
             aita_df.to_csv(name, index=False)
         elif saveas and type(saveas) == bool:
-            name = "../data/" + subreddit.lower() + ".csv"
+            name = "../data/raw/" + subreddit.lower() + ".csv"
             aita_df.to_csv(name, index=False)
         if return_df:
             return aita_df
