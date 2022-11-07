@@ -30,6 +30,7 @@ class BERTopicModel(Model):
             word_scores = [score for (word, score) in self.model.get_topic(i)]
             frequency = self.model.get_topic_freq(i)
             output.add_topic(words, word_scores, frequency)
+        output.topic_word_matrix = output.create_topic_word_matrix()
         return output
     
     def init_default_parameters(self):
