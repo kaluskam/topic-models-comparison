@@ -1,5 +1,6 @@
 from utils.data_structures import InputData, OutputData
 
+
 class Metric:
     """
     A template class to use for all metrics
@@ -7,6 +8,7 @@ class Metric:
     def __init__(self, flag, range, parameters = None):
         if parameters is not None:
             assert type(parameters) == dict
+            self.parameters = parameters
         if flag is not None:
             assert type(flag) == bool
         self.flag = flag
@@ -18,3 +20,6 @@ class Metric:
 
     def init_default_parameters(self):
         pass
+
+
+
