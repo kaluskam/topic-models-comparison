@@ -47,5 +47,6 @@ class LDAModel(Model):
                                                  "no_above" : 0.4},
                             "lda": {"num_topics" : 10,
                                      "alpha" : "auto",
-                                     "eval_every" : 2}}
+                                     "eval_every" : 2,
+                                     "passes": 100}}
 

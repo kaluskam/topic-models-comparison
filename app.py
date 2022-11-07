@@ -11,7 +11,7 @@ def create_metrics():
 def load_data():
     df = pd.read_csv("data/aita_df.csv")
     dp = DataPreprocessor(True, False)
-    text_df = dp.preprocess_dataframe(df.loc[1:100, ], "selftext", "processed_text", True)
+    text_df = dp.preprocess_dataframe(df.loc[1:500, ], "selftext", "processed_text", True)
     datamodel = InputData()
     datamodel.texts_from_df(text_df, "processed_text")
     return datamodel
