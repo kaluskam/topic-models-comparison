@@ -16,7 +16,10 @@ class Model:
     def fit(self, data):
         assert type(data) == InputData
 
-    def get_topics(self):
+    def get_output(self):
+        pass
+
+    def _match_texts_with_topics(self):
         pass
 
     def evaluate(self):
