@@ -9,7 +9,7 @@ class InputData:
         self.texts = texts # propozycja wstępna, pewnie warto byłoby dodać indeksy dla tych tekstów
 
     def texts_from_df(self, df, column):
-        self.texts = [value[0] for value in df[[column]].values]
+        self.texts = [value[0].split(',') for value in df[[column]].values]
 
 
 class OutputData:

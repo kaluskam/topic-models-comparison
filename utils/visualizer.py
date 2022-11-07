@@ -4,6 +4,8 @@ import datetime as dt
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from umap import UMAP
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 
 class Visualizer:
@@ -68,6 +70,7 @@ def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
         df['year'] = df[date_column].apply(
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+        print(df)
         df_vis = df.groupby(['year', 'month', 'topic_id']).size().reset_index(
             name='counts')
         df_vis['date'] = df_vis.apply(lambda row: f'{row.year}-{row.month}-01',
@@ -94,4 +97,14 @@ def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
     #     dtick='M1',
     #     tickformat='%b\n%Y'
     # )
-    fig.show()
+    return fig
+
+
+def generate_wordcloud(input_data):
+    words = ''
+    for text in input_data.texts:
+        words += ' '.join(text) + ' '
+
+    word_cloud = WordCloud(background_color='white', min_font_size=10, width=800, height=400).generate(words)
+    return word_cloud.to_image()
+
