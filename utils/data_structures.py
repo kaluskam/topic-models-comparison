@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import re
-
 
 class InputData:
     """
@@ -11,7 +9,7 @@ class InputData:
         self.texts = texts # propozycja wstępna, pewnie warto byłoby dodać indeksy dla tych tekstów
 
     def texts_from_df(self, df, column):
-        self.texts = [value[0].split(',') for value in df[[column]].values]
+        self.texts = [value[0] for value in df[[column]].values]
 
 
 class OutputData:
@@ -22,14 +20,12 @@ class OutputData:
         self.texts_topics = pd.DataFrame({'text_id': [], 'topic_id': []})
         self.documents = documents
         self.topics = []
-        self.topics_dict = {}
         self.n_topics = 0
         self.topic_word_matrix = []
 
     def add_topic(self, words, word_scores, frequency, name="", number_type=None):
         new_topic = Topic(words, word_scores, frequency, name, number_type)
         self.topics.append(new_topic)
-        self.topics_dict[self.n_topics] = new_topic
         self.n_topics += 1
 
     def get_topics(self):
@@ -45,7 +41,7 @@ class OutputData:
         ret_string = ""
         for i in range(1, n_display + 1):
             ret_string += f"Topic {i}\n"
-            ret_string += self.topics[i-i].__repr__()
+            ret_string += self.topics[i-1].__repr__()
             ret_string += "\n"
         return ret_string + "... skipped " + str(n_skipped) + " topics"
 
@@ -74,7 +70,7 @@ class Topic:
     def __repr__(self) -> str:
         ret_string = "<\n"
         for i in range(self.length):
-                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]))
+                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]) + "\n")
         return ret_string + "\n>"
 
     def get_words(self):
