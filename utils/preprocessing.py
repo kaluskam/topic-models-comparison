@@ -7,13 +7,16 @@ import pandas as pd
 from utils.data_structures import InputData
 import os
 
+
+nltk.download('wordnet', quiet = True)
+nltk.download('omw-1.4', quiet = True)
+
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk import WordNetLemmatizer
 
-nltk.download('wordnet')
-nltk.download('omw-1.4')
+
 
 STOP_WORDS = stopwords.words('english')
 PUNCTUATION = list(string.punctuation) + ["\"\"", "``", "\'\'"]
@@ -27,6 +30,7 @@ class DataPreprocessor:
         self.min_word_len = min_word_len
 
     def preprocess_dataframe(self, df, text_column, dest_column, remove_empty_rows, inplace=False):
+        
         if inplace:
             df_copy = df
         else:
@@ -34,6 +38,10 @@ class DataPreprocessor:
 
         if type(text_column) == str:
             text_column = [text_column]
+        elif type(text_column) == list and len(text_column) >1:
+            df_copy = df_copy.fillna('')
+            df_copy["_new_text_"] = df_copy[text_column].astype(str).apply(" ".join, axis=1)
+            text_column = ["_new_text_"]
 
         df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
         initial_text = df_copy[text_column[0]]
