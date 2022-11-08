@@ -51,8 +51,8 @@ class OutputData:
 
     def create_topic_word_matrix(self):
         all_probs = []
-        for i in range(len(self.topics_dict)):
-            probs = re.findall(r'0.\d+', str(self.topics_dict[i]))
+        for topic in self.topics:
+            probs = topic.word_scores
             all_probs.append(probs)
         topics_word_matrix = np.array(all_probs).astype(float)
         return topics_word_matrix
