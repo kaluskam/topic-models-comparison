@@ -4,6 +4,7 @@ from octis.evaluation_metrics.topic_significance_metrics import *
 class KLUniformMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "KL Uniform"
         if parameters is None:
             self.init_default_parameters()
 
@@ -13,10 +14,9 @@ class KLUniformMetric(Metric):
         topics_dict = {"topic-word-matrix": outputData.topic_word_matrix}
         return kl_uniform.score(topics_dict)
 
-
-
 class KLBackgroundMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
+        self.name = "KL Background"
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()

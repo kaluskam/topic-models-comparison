@@ -7,6 +7,7 @@ import re
 
 class TopicDiversityMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
+        self.name = "Topic Diversity"
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -27,6 +28,7 @@ class TopicDiversityMetric(Metric):
 class InvertedRBOMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "Inverted RBO"
         if parameters is None:
             self.init_default_parameters()
 
@@ -47,6 +49,7 @@ class InvertedRBOMetric(Metric):
 
 class LogOddsRatioMetric(Metric):
     def __init__(self, flag=False, range=(0, float("inf"))):
+        self.name = "Log Odds Ratio"
         super().__init__(flag, range)
 
     def evaluate(self, inputData, outputData):
@@ -58,6 +61,7 @@ class LogOddsRatioMetric(Metric):
 
 class WordEmbeddingsInvertedRBOMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
+        self.name = "Word Embeddings Inverted RBO"
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -85,6 +89,7 @@ class WordEmbeddingsInvertedRBOMetric(Metric):
 class WordEmbeddingsInvertedRBOCentroidMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "Word Embeddings Inverted RBO Centroid"
         if parameters is None:
             self.init_default_parameters()
 

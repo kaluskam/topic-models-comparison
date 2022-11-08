@@ -4,6 +4,7 @@ from octis.evaluation_metrics.similarity_metrics import RBO, WordEmbeddingsPairw
 class RBOMetric(Metric): #Opposite to InvertedRBO metric
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "RBO"
         if parameters is None:
             self.init_default_parameters()
 
@@ -20,6 +21,7 @@ class WordEmbeddingPairwiseSimilarityMetric(Metric):
 
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "Word Embedding Pairwise Similarity"
         if parameters is None:
             self.init_default_parameters()
 
@@ -44,6 +46,7 @@ class WordEmbeddingPairwiseSimilarityMetric(Metric):
 class WordEmbeddingCentroidSimilarityMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "Word Embedding Centroid Similarity"
         if parameters is None:
             self.init_default_parameters()
 
@@ -67,6 +70,7 @@ class WordEmbeddingCentroidSimilarityMetric(Metric):
 class PairwiseJacckardSimilarityMetric(Metric):
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "Pairwise Jacckard Similarity"
         if parameters is None:
             self.init_default_parameters()
 
