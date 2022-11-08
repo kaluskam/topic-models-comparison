@@ -43,6 +43,7 @@ class LDAModel(Model):
             self.output.add_topic(words, word_scores, frequency)
 
         self._match_texts_with_topics()
+        self.output.topic_word_matrix = self.output.create_topic_word_matrix()
 
         return self.output
 
@@ -55,8 +56,8 @@ class LDAModel(Model):
         self.output.add_texts_topics(text_ids, topic_ids)
 
     def init_default_parameters(self):
-        self.parameters = {"filter_extremes": {"no_below": 20,
-                                               "no_above": 0.4},
+        self.parameters = {"filter_extremes": {"no_below": 2, #20
+                                               "no_above": 0.1}, #0.4
                            "lda": {"num_topics": 10,
                                    "alpha": "auto",
                                    "eval_every": 2}}

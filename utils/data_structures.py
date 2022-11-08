@@ -1,4 +1,6 @@
 import pandas as pd
+import numpy as np
+import re
 
 
 class InputData:
@@ -22,6 +24,7 @@ class OutputData:
         self.topics = []
         self.topics_dict = {}
         self.n_topics = 0
+        self.topic_word_matrix = []
 
     def add_topic(self, words, word_scores, frequency, name="", number_type=None):
         new_topic = Topic(words, word_scores, frequency, name, number_type)
@@ -45,6 +48,14 @@ class OutputData:
             ret_string += self.topics[i-i].__repr__()
             ret_string += "\n"
         return ret_string + "... skipped " + str(n_skipped) + " topics"
+
+    def create_topic_word_matrix(self):
+        all_probs = []
+        for i in range(len(self.topics_dict)):
+            probs = re.findall(r'0.\d+', str(self.topics_dict[i]))
+            all_probs.append(probs)
+        topics_word_matrix = np.array(all_probs).astype(float)
+        return topics_word_matrix
 
 
 class Topic:

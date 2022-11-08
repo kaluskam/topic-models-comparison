@@ -26,7 +26,7 @@ class NMFModel(Model):
 
     def get_output(self):
         components_df = pd.DataFrame(self.model.components_,
-                                     columns=self.tfidf_vectorizer.get_feature_names_out())
+                                     columns=self.tfidf_vectorizer.get_feature_names()) #na nowej wersji jest out
         self.output = OutputData(self.data)
 
         frequencies = np.sum(self.W, axis=1)
@@ -39,6 +39,7 @@ class NMFModel(Model):
             self.output.add_topic(words, word_scores, frequencies[topic])
 
         self._match_texts_with_topics()
+        self.output.topic_word_matrix = self.output.create_topic_word_matrix()
 
         return self.output
 

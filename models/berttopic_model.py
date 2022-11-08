@@ -32,12 +32,13 @@ class BERTopicModel(Model):
             frequency = self.model.get_topic_freq(i)
             self.output.add_topic(words, word_scores, frequency)
 
-        #self._match_texts_with_topics()
-        return self.output
+            self.output.topic_word_matrix = self.output.create_topic_word_matrix()
+            return self.output
 
     def _match_texts_with_topics(self):
         self.topic_ids = np.array(self.topic_ids) + 1
         self.output.add_texts_topics(np.arange(1, len(self.topic_ids) + 1), self.topic_ids)
+
 
     def init_default_parameters(self):
         self.parameters = {"bertopic": {"n_gram_range": (1, 1)}}

@@ -54,6 +54,7 @@ class DataDownloader:
             aita_df.created = aita_df.created.apply(lambda x: str(dt.date.fromtimestamp(x)))
         aita_df = aita_df.reset_index(drop=True)
         aita_df = aita_df.rename(columns={"selftext": "text", "created": "date"})
+        aita_df = aita_df.sort_values('date')
         path = "../data/raw/"
         if not os.path.exists(path):
             os.mkdir(path)
