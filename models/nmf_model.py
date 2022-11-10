@@ -55,3 +55,7 @@ class NMFModel(Model):
     def init_default_parameters(self):
         self.parameters = {'tfidf': {'preprocessor': ' '.join},
                            'nmf': {'n_components': 5}}
+
+
+    def save(self, filepath):
+        super().save(filepath)

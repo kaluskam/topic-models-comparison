@@ -41,3 +41,6 @@ class BERTopicModel(Model):
 
     def init_default_parameters(self):
         self.parameters = {"bertopic": {"n_gram_range": (1, 1)}}
+
+    def save(self, filepath):
+        super().save(filepath)

@@ -12,10 +12,7 @@ class InputData:
         self.df = df
 
     def texts_from_df(self, df, column):
-        print(df.head(5))
         self.texts = [value[0].split(',') for value in df[[column]].values]
-
-
 
 
 class OutputData:
@@ -49,14 +46,14 @@ class OutputData:
         ret_string = ""
         for i in range(1, n_display + 1):
             ret_string += f"Topic {i}\n"
-            ret_string += self.topics[i-i].__repr__()
+            ret_string += self.topics[i-1].__repr__()
             ret_string += "\n"
         return ret_string + "... skipped " + str(n_skipped) + " topics"
 
     def create_topic_word_matrix(self):
         all_probs = []
-        for i in range(len(self.topics_dict)):
-            probs = re.findall(r'0.\d+', str(self.topics_dict[i]))
+        for topic in self.topics:
+            probs = topic.word_scores
             all_probs.append(probs)
         topics_word_matrix = np.array(all_probs).astype(float)
         return topics_word_matrix
@@ -78,7 +75,7 @@ class Topic:
     def __repr__(self) -> str:
         ret_string = "<\n"
         for i in range(self.length):
-                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]))
+                ret_string += (self.words[i] + "\t\t" + str(self.word_scores[i]) + "\n")
         return ret_string + "\n>"
 
     def get_words(self):

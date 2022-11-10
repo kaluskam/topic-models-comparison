@@ -10,6 +10,7 @@ class UMassCoherenceMetric(Metric):
 
     def __init__(self, flag=False, range=(-14, 14), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "UMass Coherence"
         if parameters is None:
             self.init_default_parameters()
 
@@ -35,6 +36,7 @@ class CVCoherenceMetric(Metric):
 
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "CV Coherence"
         if parameters is None:
             self.init_default_parameters()
 
@@ -60,6 +62,7 @@ class CUCICoherenceMetric(Metric):
 
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "CUCI Coherence"
         if parameters is None:
             self.init_default_parameters()
 
@@ -84,6 +87,7 @@ class CUCICoherenceMetric(Metric):
 class CNPMICoherenceMetric(Metric):
 
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
+        self.name = "CNPMI Coherence"
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -108,6 +112,7 @@ class CNPMICoherenceMetric(Metric):
 
 class WECoherencePairwiseMetric(Metric):
     def __init__(self, flag=False, range=(-1, 1), parameters=None):
+        self.name = "WE Pairwise Coherence"
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -134,6 +139,7 @@ class WECoherencePairwiseMetric(Metric):
 class WECoherenceCentroidMetric(Metric):
     def __init__(self, flag=False, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
+        self.name = "WE Centroid Coherence"
         if parameters is None:
             self.init_default_parameters()
 

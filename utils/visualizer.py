@@ -84,7 +84,7 @@ def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
         pass
 
     df_vis['topic'] = df_vis['topic_id'].apply(lambda topic_id: ' '.join(
-        outputdata.topics_dict[topic_id].get_words()))
+        outputdata.topics[topic_id].get_words()))
 
     fig = px.line(df_vis, x='date', y='counts', color='topic', markers=True,
                   labels={

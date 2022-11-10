@@ -1,5 +1,5 @@
 from utils.data_structures import InputData
-
+import pickle
 
 class Model:
     """
@@ -30,3 +30,8 @@ class Model:
 
     def init_default_parameters(self):
         pass
+
+    def save(self, filepath):
+        with open(filepath, "wb") as f:
+            pickle.dump(self, f)
+

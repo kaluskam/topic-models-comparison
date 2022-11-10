@@ -61,3 +61,5 @@ class LDAModel(Model):
                            "lda": {"num_topics": 10,
                                    "alpha": "auto",
                                    "eval_every": 2}}
+    def save(self, filepath):
+        super().save(filepath)
