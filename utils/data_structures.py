@@ -7,11 +7,15 @@ class InputData:
     """
     Model danych wejściowych do modelu
     """
-    def __init__(self, texts = None):
+    def __init__(self, texts=None, df=None):
         self.texts = texts # propozycja wstępna, pewnie warto byłoby dodać indeksy dla tych tekstów
+        self.df = df
 
     def texts_from_df(self, df, column):
+        print(df.head(5))
         self.texts = [value[0].split(',') for value in df[[column]].values]
+
+
 
 
 class OutputData:

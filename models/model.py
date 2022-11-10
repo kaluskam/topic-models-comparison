@@ -13,7 +13,7 @@ class Model:
         self.parameters = parameters
         self.model = None
 
-    def fit(self, data):
+    def fit(self, data, n_topics=10):
         assert type(data) == InputData
 
     def get_output(self):

@@ -17,7 +17,7 @@ datamodel.texts_from_df(text_df, "processed_text")
 nmf = NMFModel()
 nmf.fit(datamodel)
 nmf_topics = nmf.get_output()
-print(nmf.output.texts_topics)
+# print(nmf.output.texts_topics)
 texts_topics_df = nmf.output.texts_topics
 
 

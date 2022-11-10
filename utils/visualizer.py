@@ -64,17 +64,18 @@ class Visualizer:
 
 
 def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
-    assert interval in ('day', 'week', 'month', 'year')
     if interval == 'month':
         df['month'] = df[date_column].apply(
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
+        print(df['month'].unique())
         df['year'] = df[date_column].apply(
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
-        print(df)
         df_vis = df.groupby(['year', 'month', 'topic_id']).size().reset_index(
             name='counts')
         df_vis['date'] = df_vis.apply(lambda row: f'{row.year}-{row.month}-01',
                                       axis=1)
+        df_vis['date'] = pd.to_datetime(df_vis['date'], format='%Y-%m-%d')
+
     elif interval == 'year':
         # TODO
         pass
@@ -92,6 +93,16 @@ def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
                   },
                   hover_data={'topic': True})
     fig.update_traces(marker={'size': 12})
+    fig.update_layout(
+        plot_bgcolor='rgba(237, 250, 253, 0.5)',
+        title='Topics over time',
+        xaxis_title='Date',
+        yaxis_title='Counts',
+        font=dict(
+            size=14,
+            color='Black'
+        ))
+
     # opcjonalne formatowanie daty
     # fig.update_xaxes(
     #     dtick='M1',
@@ -105,6 +116,9 @@ def generate_wordcloud(input_data):
     for text in input_data.texts:
         words += ' '.join(text) + ' '
 
-    word_cloud = WordCloud(background_color='white', min_font_size=10, width=800, height=400).generate(words)
-    return word_cloud.to_image()
+    word_cloud = WordCloud(background_color='white', min_font_size=14, width=1000, height=500).generate(words)
+    wc = px.imshow(word_cloud.to_image())
+    wc.update_xaxes(visible=False)
+    wc.update_yaxes(visible=False)
+    return wc
 

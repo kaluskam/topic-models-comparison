@@ -39,6 +39,5 @@ class BERTopicModel(Model):
         self.topic_ids = np.array(self.topic_ids) + 1
         self.output.add_texts_topics(np.arange(1, len(self.topic_ids) + 1), self.topic_ids)
 
-
     def init_default_parameters(self):
         self.parameters = {"bertopic": {"n_gram_range": (1, 1)}}

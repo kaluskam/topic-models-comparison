@@ -21,7 +21,7 @@ STOP_WORDS_PUNCT = set(STOP_WORDS + PUNCTUATION)
 
 
 class DataPreprocessor:
-    def __init__(self, lematize=False, stem=True, min_word_len=2):
+    def __init__(self, lematize=True, stem=False, min_word_len=2):
         self.lematize = lematize
         self.stem = stem
         self.min_word_len = min_word_len

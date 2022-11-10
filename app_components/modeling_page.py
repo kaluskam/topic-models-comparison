@@ -1,0 +1,165 @@
+import dash_bootstrap_components as dbc
+import dash_mantine_components as dmc
+import pandas as pd
+from dash import dcc, html, Input, Output, callback
+import datetime as dt
+
+from utils.visualizer import visualise_topics_overtime, generate_wordcloud
+from utils.data_loading import load_data
+from models.nmf_model import NMFModel
+from models.lda_model import LDAModel
+from models.berttopic_model import BERTopicModel
+from utils.data_structures import InputData
+
+START_DATE = dt.date(2019, 10, 1)
+END_DATE = dt.date(2022, 9, 30)
+MODEL_NAMES_DICT = {
+    'nmf': NMFModel(),
+    'lda': LDAModel(),
+    'bertopic': BERTopicModel()
+}
+
+default_data = load_data(['askmen'], [END_DATE - dt.timedelta(days=365), END_DATE])
+default_wordcloud = generate_wordcloud(default_data)
+model = NMFModel()
+model.fit(default_data, 10)
+output = model.get_output()
+texts_topics_df = output.texts_topics
+r = pd.merge(default_data.df, texts_topics_df, left_index=True,
+             right_on='text_id')
+default_overtime_graph = visualise_topics_overtime(r, 'date', output, 'month')
+
+## Components
+
+subreddit_select = html.Div([
+    dmc.MultiSelect(
+        id='subreddits-multiselect',
+        label='Subreddits',
+        data=[
+            {'label': 'AskMen', 'value': 'askmen'},
+            {'label': 'AskWomen', 'value': 'askwomen'},
+            {'label': 'AskReddit', 'value': 'askreddit'}],
+        value=['askmen']
+    )]
+)
+
+model_select = html.Div([
+    dmc.Select(
+        id='topic-model-select',
+        label='Topic model',
+        data=[
+            {'label': 'NMF', 'value': 'nmf'},
+            {'label': 'LDA', 'value': 'lda'},
+            {'label': 'BERTopic', 'value': 'bertopic'}],
+        value='nmf'
+    )]
+)
+
+n_topics_input = html.Div([
+    dmc.TextInput(id='n_topics_input',
+                  label='Number of topics',
+                  type='number',
+                  value=10)
+])
+
+time_interval_radio_buttons = html.Div([
+    dmc.RadioGroup(id='time-interval-radios',
+                   label='Time interval unit',
+                   data=[{'label': 'Day', 'value': 'day'},
+                         {'label': 'Week', 'value': 'week'},
+                         {'label': 'Month', 'value': 'month'},
+                         {'label': 'Year', 'value': 'year'}],
+                   value='month',
+                   size='sm')])
+
+date_range_picker = html.Div([
+    dmc.DateRangePicker(id='date-range-picker',
+                        label='Date range',
+                        minDate=START_DATE,
+                        maxDate=END_DATE,
+                        value=[END_DATE - dt.timedelta(days=365), END_DATE])])
+
+run_analysis_button = html.Div([
+    dmc.Button('Run analysis',
+               id='run-analysis-button',
+               variant='light',
+               fullWidth=True,
+               )
+])
+
+controls_card = dbc.Card([
+    html.Div([
+        subreddit_select
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        model_select
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        n_topics_input
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        time_interval_radio_buttons
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        date_range_picker
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        run_analysis_button
+    ])
+],
+    body=True)
+
+
+wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
+
+modelling_page = dbc.Container([
+    dbc.Row([
+        dbc.Col(controls_card, md=4),
+        dbc.Col(wordcloud_graph, md=8)
+    ],
+        align='center'),
+    dbc.Row([
+        dcc.Graph(id='topics-over-time-graph', figure=default_overtime_graph)
+    ])
+],
+    fluid=True
+)
+
+
+
+
+@callback(
+    Output(component_id='run-analysis-button', component_property='n_clicks'),
+    Output(component_id='wordcloud-graph', component_property='figure'),
+    Output(component_id='topics-over-time-graph', component_property='figure'),
+    Input(component_id='run-analysis-button', component_property='n_clicks'),
+    Input(component_id='subreddits-multiselect', component_property='value'),
+    Input(component_id='topic-model-select', component_property='value'),
+    Input(component_id='n_topics_input', component_property='value'),
+    Input(component_id='time-interval-radios', component_property='value'),
+    Input(component_id='date-range-picker', component_property='value'))
+def run_analysis(n_clicks, subreddits, topic_model, n_topics, time_interval_unit,
+                 date_range):
+
+    if n_clicks == 1:
+        input_data = load_data(subreddits, date_range)
+
+        wc = generate_wordcloud(input_data)
+
+        model = MODEL_NAMES_DICT[topic_model]
+        model.fit(input_data, n_topics)
+        output = model.get_output()
+        texts_topics_df = output.texts_topics
+
+        r = pd.merge(input_data.df, texts_topics_df, left_index=True,
+                     right_on='text_id')
+        fig = visualise_topics_overtime(r, 'date', output, time_interval_unit)
+        return 0, wc, fig
+
+    else:
+        raise Exception("Doesn't change anything")
