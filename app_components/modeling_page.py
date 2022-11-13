@@ -4,12 +4,12 @@ import pandas as pd
 from dash import dcc, html, Input, Output, callback
 import datetime as dt
 
-from utils.visualizer import visualise_topics_overtime, generate_wordcloud
+from utils.visualizer import visualise_topics_overtime, generate_wordcloud, \
+    Visualizer
 from utils.data_loading import load_data
 from models.nmf_model import NMFModel
 from models.lda_model import LDAModel
 from models.berttopic_model import BERTopicModel
-from utils.data_structures import InputData
 
 START_DATE = dt.date(2019, 10, 1)
 END_DATE = dt.date(2022, 9, 30)
@@ -19,16 +19,38 @@ MODEL_NAMES_DICT = {
     'bertopic': BERTopicModel()
 }
 
-default_data = load_data(['askmen'], [END_DATE - dt.timedelta(days=365), END_DATE])
+default_data = load_data(['askmen'],
+                         [END_DATE - dt.timedelta(days=365), END_DATE])
 default_wordcloud = generate_wordcloud(default_data)
+
+vs = Visualizer()
+## MACRO
 model = NMFModel()
-model.fit(default_data, 10)
+model.fit(default_data, 5)
 output = model.get_output()
 texts_topics_df = output.texts_topics
 r = pd.merge(default_data.df, texts_topics_df, left_index=True,
              right_on='text_id')
-default_overtime_graph = visualise_topics_overtime(r, 'date', output, 'month')
+default_overtime_graph_macro = visualise_topics_overtime(r, 'date', output,
+                                                         'Topics over time macro',
+                                                         'month')
+default_topic_similarity_macro = vs.visualize_topics_in_documents(default_data,
+                                                                  output,
+                                                                  'Topics similarity macro')
 
+##MICRO
+model = NMFModel()
+model.fit(default_data, 20)
+output = model.get_output()
+texts_topics_df = output.texts_topics
+r = pd.merge(default_data.df, texts_topics_df, left_index=True,
+             right_on='text_id')
+default_overtime_graph_micro = visualise_topics_overtime(r, 'date', output,
+                                                         'Topics over time micro',
+                                                         'month')
+default_topic_similarity_micro = vs.visualize_topics_in_documents(default_data,
+                                                                  output,
+                                                                  'Topics similarity micro')
 ## Components
 
 subreddit_select = html.Div([
@@ -55,11 +77,20 @@ model_select = html.Div([
     )]
 )
 
-n_topics_input = html.Div([
-    dmc.TextInput(id='n_topics_input',
-                  label='Number of topics',
+n_topics_input_macro = html.Div([
+    dmc.TextInput(id='n-topics-input-macro',
+                  label='Number of topics for macro analysis',
                   type='number',
-                  value=10)
+                  value=5)
+])
+
+n_topics_input_micro = html.Div([
+    dmc.TextInput(id='n-topics-input-micro',
+                  label='Number of topics for micro analysis',
+                  type='number',
+                  description='Type larger number than in macro analysis.\n '
+                              'This will give you insights into more specific topics.',
+                  value=20)
 ])
 
 time_interval_radio_buttons = html.Div([
@@ -97,7 +128,11 @@ controls_card = dbc.Card([
     ]),
     dmc.Space(h=10),
     html.Div([
-        n_topics_input
+        n_topics_input_macro
+    ]),
+    dmc.Space(h=10),
+    html.Div([
+        n_topics_input_micro
     ]),
     dmc.Space(h=10),
     html.Div([
@@ -114,7 +149,6 @@ controls_card = dbc.Card([
 ],
     body=True)
 
-
 wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
 
 modelling_page = dbc.Container([
@@ -124,42 +158,77 @@ modelling_page = dbc.Container([
     ],
         align='center'),
     dbc.Row([
-        dcc.Graph(id='topics-over-time-graph', figure=default_overtime_graph)
+        dbc.Col(dcc.Graph(id='topic-similarity-macro',
+                          figure=default_topic_similarity_macro), md=6),
+        dbc.Col(dcc.Graph(id='topic-similarity-micro',
+                          figure=default_topic_similarity_micro), md=6)
+    ]),
+    dbc.Row([
+        dcc.Graph(id='topics-over-time-graph-macro',
+                  figure=default_overtime_graph_macro)
+    ]),
+    dbc.Row([
+        dcc.Graph(id='topics-over-time-graph-micro',
+                  figure=default_overtime_graph_micro)
     ])
 ],
     fluid=True
 )
 
 
-
-
 @callback(
     Output(component_id='run-analysis-button', component_property='n_clicks'),
     Output(component_id='wordcloud-graph', component_property='figure'),
-    Output(component_id='topics-over-time-graph', component_property='figure'),
+    Output(component_id='topics-over-time-graph-macro',
+           component_property='figure'),
+    Output(component_id='topics-over-time-graph-micro',
+           component_property='figure'),
+    Output(component_id='topic-similarity-macro', component_property='figure'),
+    Output(component_id='topic-similarity-micro', component_property='figure'),
     Input(component_id='run-analysis-button', component_property='n_clicks'),
     Input(component_id='subreddits-multiselect', component_property='value'),
     Input(component_id='topic-model-select', component_property='value'),
-    Input(component_id='n_topics_input', component_property='value'),
+    Input(component_id='n-topics-input-macro', component_property='value'),
+    Input(component_id='n-topics-input-micro', component_property='value'),
     Input(component_id='time-interval-radios', component_property='value'),
     Input(component_id='date-range-picker', component_property='value'))
-def run_analysis(n_clicks, subreddits, topic_model, n_topics, time_interval_unit,
-                 date_range):
+def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
+                 n_topics_micro,
+                 time_interval_unit, date_range):
 
-    if n_clicks == 1:
+    if n_clicks is not None and n_clicks >= 1:
         input_data = load_data(subreddits, date_range)
 
         wc = generate_wordcloud(input_data)
 
         model = MODEL_NAMES_DICT[topic_model]
-        model.fit(input_data, n_topics)
+
+        ## MACRO
+        model.fit(input_data, int(n_topics_macro))
         output = model.get_output()
         texts_topics_df = output.texts_topics
-
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
-        fig = visualise_topics_overtime(r, 'date', output, time_interval_unit)
-        return 0, wc, fig
+        fig_macro = visualise_topics_overtime(r, 'date', output,
+                                              'Topics over time macro',
+                                              time_interval_unit)
+        fig_topic_similarity_macro = vs.visualize_topics_in_documents(
+            input_data, output, 'Topics similarity macro')
+
+        ## MICRO
+        model.fit(input_data, int(n_topics_micro))
+        output = model.get_output()
+        texts_topics_df = output.texts_topics
+        r = pd.merge(input_data.df, texts_topics_df, left_index=True,
+                     right_on='text_id')
+        fig_micro = visualise_topics_overtime(r, 'date', output,
+                                              'Topics over time micro',
+                                              time_interval_unit)
+        fig_topic_similarity_micro = vs.visualize_topics_in_documents(
+            input_data, output, 'Topics similarity micro')
+        return 0, wc, fig_macro, fig_micro, fig_topic_similarity_macro, fig_topic_similarity_micro
 
     else:
         raise Exception("Doesn't change anything")
+
+

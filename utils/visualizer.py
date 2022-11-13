@@ -7,6 +7,10 @@ from umap import UMAP
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
+FONT = dict(
+            size=14,
+            color='Black'
+        )
 
 class Visualizer:
     def __init__(self, parameters=None):
@@ -24,7 +28,7 @@ class Visualizer:
 
         return fig
 
-    def visualize_topics_in_documents(self, inputData, outputData):
+    def visualize_topics_in_documents(self, inputData, outputData, title):
         self.tfidf = TfidfVectorizer(**self.parameters["tfidf"])
         self.tfidf.fit(inputData.texts)
         topics = [topic.words for topic in outputData.topics]
@@ -52,7 +56,9 @@ class Visualizer:
                                      "Texts": True,
                                      "Size": False,
                                      "x": False,
-                                     "y": False})
+                                     "y": False},
+                         title=title)
+        fig.update_layout(font=FONT)
         return fig
 
     def init_default_parameters(self):
@@ -63,51 +69,75 @@ class Visualizer:
                                     "random_state": 123}}
 
 
-def visualise_topics_overtime(df, date_column, outputdata, interval='month'):
-    if interval == 'month':
+def visualise_topics_overtime(df, date_column, outputdata, title, interval='month'):
+    xaxis_title = ''
+    ticktext = []
+    tickformat = None
+    if interval == 'year':
+        df['year'] = df[date_column].apply(
+            lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+        df_vis = df.groupby(['year', 'topic_id']).size().reset_index(
+            name='counts')
+        df_vis['x_axis_date'] = df_vis['year']
+        xaxis_title = 'Year'
+        ticktext = sorted(df['year'].unique())
+
+    elif interval == 'month':
         df['month'] = df[date_column].apply(
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
-        print(df['month'].unique())
         df['year'] = df[date_column].apply(
             lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
         df_vis = df.groupby(['year', 'month', 'topic_id']).size().reset_index(
             name='counts')
-        df_vis['date'] = df_vis.apply(lambda row: f'{row.year}-{row.month}-01',
+        df_vis['x_axis_date'] = df_vis.apply(lambda row: f'{row.year}-{row.month}',
                                       axis=1)
-        df_vis['date'] = pd.to_datetime(df_vis['date'], format='%Y-%m-%d')
+        xaxis_title = 'Month'
+        ticktext = df_vis['x_axis_date']
+        tickformat = '%b, %Y'
 
-    elif interval == 'year':
-        # TODO
-        pass
     elif interval == 'week':
-        # TODO
-        pass
+        df['week'] = df[date_column].apply(
+            lambda date: dt.datetime.strptime(date, "%Y-%m-%d").isocalendar().week)
+        df['year'] = df[date_column].apply(
+            lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+        df_vis = df.groupby(['year', 'week', 'topic_id']).size().reset_index(
+            name='counts')
+        df_vis['x_axis_date'] = df_vis.apply(
+            lambda row: f'Week {row.week}, {row.year}',
+            axis=1)
+        xaxis_title = 'Week'
+        ticktext = df_vis['x_axis_date']
+
+    elif interval == 'day':
+        df_vis = df.groupby([date_column, 'topic_id']).size().reset_index(
+            name='counts')
+        df_vis['x_axis_date'] = df_vis[date_column]
+        xaxis_title = 'Day'
+        ticktext = df_vis['x_axis_date']
 
     df_vis['topic'] = df_vis['topic_id'].apply(lambda topic_id: ' '.join(
         outputdata.topics[topic_id].get_words()))
 
-    fig = px.line(df_vis, x='date', y='counts', color='topic', markers=True,
+    fig = px.line(df_vis, x='x_axis_date', y='counts', color='topic', markers=True,
                   labels={
                       'topic_id': 'Topic number',
-                      'topic': 'Topic'
+                      'topic': 'Topic',
+                      'x_axis_date': xaxis_title,
+                      'counts': 'Counts'
                   },
                   hover_data={'topic': True})
     fig.update_traces(marker={'size': 12})
     fig.update_layout(
         plot_bgcolor='rgba(237, 250, 253, 0.5)',
-        title='Topics over time',
-        xaxis_title='Date',
+        title=title,
+        xaxis_title=xaxis_title,
         yaxis_title='Counts',
-        font=dict(
-            size=14,
-            color='Black'
-        ))
+        xaxis={
+            'tickvals': ticktext,
+            'tickformat': tickformat
+        },
+        font=FONT)
 
-    # opcjonalne formatowanie daty
-    # fig.update_xaxes(
-    #     dtick='M1',
-    #     tickformat='%b\n%Y'
-    # )
     return fig
 
 
