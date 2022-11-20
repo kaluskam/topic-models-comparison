@@ -5,6 +5,8 @@ class RBOMetric(Metric): #Opposite to InvertedRBO metric
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "RBO"
+        self.description = "Metric calculates average similarity of topic-word lists using Ranked Biased Overlap" \
+                           "- a method to compare two ranked lists."
         if parameters is None:
             self.init_default_parameters()
 
@@ -22,6 +24,8 @@ class WordEmbeddingPairwiseSimilarityMetric(Metric):
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "Word Embedding Pairwise Similarity"
+        self.description = "Metric is used to compute the similarity level of meaning of the words inside different topics. Metric calculates average cosine similarity between all of the words in different topics based on" \
+                           "embedding model (word2vec-google-news-300 by default)."
         if parameters is None:
             self.init_default_parameters()
 
@@ -47,6 +51,8 @@ class WordEmbeddingCentroidSimilarityMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "Word Embedding Centroid Similarity"
+        self.description = "Centroid similarity is used to calculate the average distances between topic centers. Metric calculates average vector for each topic based on vectors from embedding model (google-news-300 by default) and then performes cosine similarity" \
+                           "on the topic cluster centers."
         if parameters is None:
             self.init_default_parameters()
 
@@ -71,6 +77,7 @@ class PairwiseJacckardSimilarityMetric(Metric):
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "Pairwise Jacckard Similarity"
+        self.description = "Similarity measure based on set operations (union and intersection) on words of each pair of topics."
         if parameters is None:
             self.init_default_parameters()
 
