@@ -11,6 +11,9 @@ class UMassCoherenceMetric(Metric):
     def __init__(self, flag=False, range=(-14, 14), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "UMass Coherence"
+        self.description = "UMass Coherence aims to confirm that the models learned data known to be in the corpus."
+        "The score is defined as a log-conditional-probability calculated on document co-occurences of words in preceeding documents. " \
+        #"The corpus is used to estimate the probability of a single word as the number of documents in which the word occurs divided by the total number of documents"
         if parameters is None:
             self.init_default_parameters()
 
@@ -37,6 +40,9 @@ class CVCoherenceMetric(Metric):
     def __init__(self, flag=True, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "CV Coherence"
+        self.description = "CV Coherence is a metric, which indicates how well a topic represents the reference dataset (corpus)" \
+        "In this approach the words are compared to the total word set W using two-step measure (m_nlr and cosine similarity). "
+        "The corpus is used to determine the word probabilities over a sliding window."
         if parameters is None:
             self.init_default_parameters()
 
@@ -63,6 +69,9 @@ class CUCICoherenceMetric(Metric):
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "CUCI Coherence"
+        self.description = "CUCi Coherence is used to describe how well a topic extracts the information from the corpus." \
+                           "In this approach the pairs of single words are compared using log-ratio measure." \
+                           "The probabilities used in the measure are driven as word co-occurrence counts inside corpus (calculated over a sliding window). "
         if parameters is None:
             self.init_default_parameters()
 
@@ -88,6 +97,8 @@ class CNPMICoherenceMetric(Metric):
 
     def __init__(self, flag=True, range=(-1, 1), parameters=None):
         self.name = "CNPMI Coherence"
+        self.description = "CNPMI Coherence is used to assess how well a topic is supported by the corpus. CNPMI metric calculates Normalized Pointwise Mutual Information over pairs of words inside each topic." \
+                           "The calculation is based on probabilities drawn from the reference corpus over a sliding window."
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -113,6 +124,9 @@ class CNPMICoherenceMetric(Metric):
 class WECoherencePairwiseMetric(Metric):
     def __init__(self, flag=False, range=(-1, 1), parameters=None):
         self.name = "WE Pairwise Coherence"
+        self.description = "Word Embedding Pairwise Coherence metric is used to determine the quality of the topics based on embeddings. " \
+                           "(the default embedding model is word2vec-google-news-300). " \
+                           "This metric calculates the average distance between each pair of word vectors inside a topic."
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -140,6 +154,9 @@ class WECoherenceCentroidMetric(Metric):
     def __init__(self, flag=False, range=(-1, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "WE Centroid Coherence"
+        "Word Embedding Centroid Coherence metric is used to determine the quality of the topics based on embeddings. " \
+        "(the default embedding model is word2vec-google-news-300). " \
+        "This metric calculates the average distance between each word vector and a topic cluster center."
         if parameters is None:
             self.init_default_parameters()
 
