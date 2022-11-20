@@ -38,10 +38,10 @@ class DataPreprocessor:
 
         if type(text_column) == str:
             text_column = [text_column]
-        elif type(text_column) == list and len(text_column) >1:
-            df_copy = df_copy.fillna('')
-            df_copy["_new_text_"] = df_copy[text_column].astype(str).apply(" ".join, axis=1)
-            text_column = ["_new_text_"]
+        # elif type(text_column) == list and len(text_column) > 1:
+        #     df_copy = df_copy.fillna('')
+        #     df_copy["_new_text_"] = df_copy[text_column].astype(str).apply(" ".join, axis=1)
+        #     text_column = ["_new_text_"]
 
         df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
         initial_text = df_copy[text_column[0]]
@@ -82,13 +82,12 @@ class DataPreprocessor:
         df = pd.read_csv('../data/raw/' + file + '.csv')
         return df
 
-    def save_data(self, df, subreddit):
+    @staticmethod
+    def save(df, subreddit):
         path = "../data/preprocessed/"
         if not os.path.exists(path):
             os.mkdir(path)
-        df.to_csv(path + subreddit.lower() + '.csv', index=False)
-        return
-
+        df.to_csv(path + subreddit.lower() + '.csv', index=False, sep=';')
 
     @staticmethod
     def to_InputDataModel(df, text_column):

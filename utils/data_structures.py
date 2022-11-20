@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import re
+import os
+import pickle
 
 
 class InputData:
@@ -12,7 +14,11 @@ class InputData:
         self.df = df
 
     def texts_from_df(self, df, column):
-        self.texts = [value[0].split(',') for value in df[[column]].values]
+        self.texts = [value[0] for value in df[[column]].values]
+
+    def save(self, filepath):
+        with open(filepath, 'wb') as file:
+            pickle.dump(self, file)
 
 
 class OutputData:

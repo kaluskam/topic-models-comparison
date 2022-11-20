@@ -12,7 +12,7 @@ class DataDownloader:
     def __init__(self, verbose=False):
         self.verbose = verbose
 
-    def download_data(self, subreddit, start_date="2020-10-01", end_date="2022-10-01",
+    def download_data(self, subreddit, start_date="2019-10-01", end_date="2022-10-01",
                       columns=None, saveas=False, return_df=True):
 
         if columns is None:
