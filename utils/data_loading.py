@@ -53,9 +53,7 @@ def get_new_subreddit(subreddit):
         df_raw = pd.read_csv(filepath, sep=',')
     else:
         df_raw = DataDownloader(verbose=True).download_data(subreddit,
-                                                            saveas=subreddit,
-                                                            start_date="2022-11-12",
-                                                            end_date="2022-11-15")
+                                                            saveas=subreddit)
 
     df_prep = DataPreprocessor().preprocess_dataframe(df_raw,
                                                       text_column=['title',
@@ -67,4 +65,4 @@ def get_new_subreddit(subreddit):
 
 
 if __name__ == '__main__':
-    load_data(['news'], ['2019-10-01', '2022-09-30'])
+    load_data(['worldnews'], ['2019-10-01', '2022-10-01'])
