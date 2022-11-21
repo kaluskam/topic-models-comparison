@@ -22,6 +22,9 @@ def load_data(subreddits, date_range):
             preprocessed_df_filepath = os.path.join('..', PREPROCESSED_DIR, subreddit + '.csv')
             if os.path.exists(preprocessed_df_filepath):
                 df = pd.read_csv(preprocessed_df_filepath, sep=';')
+                for col in df.columns:
+                    if col != 'date':
+                        df[col] = df[col].apply(lambda x: str(x).split(', '))
             else:
                 df = get_new_subreddit(subreddit).loc[:, ['lematized', 'date']]
             dfs.append(df.loc[
