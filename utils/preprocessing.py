@@ -87,6 +87,9 @@ class DataPreprocessor:
         path = "../data/preprocessed/"
         if not os.path.exists(path):
             os.mkdir(path)
+        for col in df.columns:
+            if col != 'date':
+                df[col] = df[col].apply(lambda x: ", ".join(x))
         df.to_csv(path + subreddit.lower() + '.csv', index=False, sep=';')
 
     @staticmethod
