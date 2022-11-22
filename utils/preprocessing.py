@@ -7,7 +7,6 @@ import pandas as pd
 from utils.data_structures import InputData
 import os
 
-
 nltk.download('wordnet', quiet = True)
 nltk.download('omw-1.4', quiet = True)
 
@@ -15,7 +14,6 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 from nltk.stem import SnowballStemmer
 from nltk import WordNetLemmatizer
-
 
 
 STOP_WORDS = stopwords.words('english')
@@ -38,10 +36,6 @@ class DataPreprocessor:
 
         if type(text_column) == str:
             text_column = [text_column]
-        # elif type(text_column) == list and len(text_column) > 1:
-        #     df_copy = df_copy.fillna('')
-        #     df_copy["_new_text_"] = df_copy[text_column].astype(str).apply(" ".join, axis=1)
-        #     text_column = ["_new_text_"]
 
         df_copy[text_column[0]] = df_copy[text_column[0]].apply(lambda text: text if type(text) == str else '')
         initial_text = df_copy[text_column[0]]
@@ -87,9 +81,6 @@ class DataPreprocessor:
         path = "../data/preprocessed/"
         if not os.path.exists(path):
             os.mkdir(path)
-        for col in df.columns:
-            if col != 'date':
-                df[col] = df[col].apply(lambda x: ", ".join(x))
         df.to_csv(path + subreddit.lower() + '.csv', index=False, sep=';')
 
     @staticmethod

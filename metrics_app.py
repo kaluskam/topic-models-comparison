@@ -54,7 +54,6 @@ metrics = [
     WordEmbeddingsInvertedRBOCentroidMetric()
 ]
 
-
 tooltip_text = [{"index": 
                 {
                     'value': '**{}** \n\n {} \n\n Takes values from {} to {} \n\n {} is better.'.format(metric.__class__.__name__,
@@ -69,8 +68,6 @@ tooltip_text = [{"index":
 metrics_df = pd.read_csv("scores_df.csv", index_col = 0).transpose()
 metrics_df = metrics_df.reset_index()
 
-
-
 metrics_table = html.Div([
     dmc.Space(h=10),
     dash_table.DataTable(metrics_df.to_dict('records'),
@@ -82,11 +79,6 @@ metrics_table = html.Div([
             'margin-left': 'auto',
             'margin-right': 'auto'}
 )
-
-
-
-
-
 
 
 

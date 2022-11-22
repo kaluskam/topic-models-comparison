@@ -1,12 +1,13 @@
-from dash import Dash, html, dcc, Input, Output
+import os
+import dash
+from dash import Dash
 import dash_bootstrap_components as dbc
-import plotly.express as px
-import pandas as pd
 
-from app_components.modeling_page import modelling_page
+import definitions as d
 
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc_css])
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc_css],
+           use_pages=True, pages_folder=os.path.join(d.ROOT_DIR, 'app_components'))
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
@@ -14,22 +15,23 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc_css])
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(
-            dbc.NavLink('Modeling', href='modeling')),
+            dbc.NavLink('Download subreddits', href='/download-subreddits')),
         dbc.NavItem(
-            dbc.NavLink('Model comparison', href='comparison')),
+            dbc.NavLink('Modeling', href='/modeling')),
         dbc.NavItem(
-            dbc.NavLink('Data Exploration', href='data-exploration'))
+            dbc.NavLink('Model comparison', href='/metrics')),
+        dbc.NavItem(
+            dbc.NavLink('Data Exploration', href='/data-exploration'))
         ],
     brand='Topic models comparison',
     brand_href='home',
     color='primary',
     dark=True
-
     )
 
 app.layout = dbc.Container([
     navbar,
-    modelling_page
+    dash.page_container
 ],
     fluid=True
 )

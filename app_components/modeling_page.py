@@ -1,26 +1,30 @@
+import os
+import dash
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
 import pandas as pd
 from dash import dcc, html, Input, Output, callback
 import datetime as dt
 
+import definitions as d
+from utils.dashboard_utils import get_data_for_subreddit_select
 from utils.visualizer import visualise_topics_overtime, generate_wordcloud, \
     Visualizer
-from utils.data_loading import load_data
+from utils.data_loading import load_downloaded_data
 from models.nmf_model import NMFModel
 from models.lda_model import LDAModel
 from models.berttopic_model import BERTopicModel
 
-START_DATE = dt.date(2019, 10, 1)
-END_DATE = dt.date(2022, 9, 30)
+dash.register_page(__name__, path='/modeling')
+
 MODEL_NAMES_DICT = {
     'nmf': NMFModel(),
     'lda': LDAModel(),
     'bertopic': BERTopicModel()
 }
 
-default_data = load_data(['askmen'],
-                         [END_DATE - dt.timedelta(days=365), END_DATE])
+default_data = load_downloaded_data(['worldnews'],
+                         [d.END_DATE - dt.timedelta(days=365), d.END_DATE])
 default_wordcloud = generate_wordcloud(default_data)
 
 vs = Visualizer()
@@ -53,15 +57,13 @@ default_topic_similarity_micro = vs.visualize_topics_in_documents(default_data,
                                                                   'Topics similarity micro')
 ## Components
 
+
 subreddit_select = html.Div([
     dmc.MultiSelect(
         id='subreddits-multiselect',
         label='Subreddits',
-        data=[
-            {'label': 'AskMen', 'value': 'askmen'},
-            {'label': 'AskWomen', 'value': 'askwomen'},
-            {'label': 'AskReddit', 'value': 'askreddit'}],
-        value=['askmen']
+        data=get_data_for_subreddit_select(),
+        value=['worldnews']
     )]
 )
 
@@ -106,9 +108,9 @@ time_interval_radio_buttons = html.Div([
 date_range_picker = html.Div([
     dmc.DateRangePicker(id='date-range-picker',
                         label='Date range',
-                        minDate=START_DATE,
-                        maxDate=END_DATE,
-                        value=[END_DATE - dt.timedelta(days=365), END_DATE])])
+                        minDate=d.START_DATE,
+                        maxDate=d.END_DATE,
+                        value=[d.END_DATE - dt.timedelta(days=365), d.END_DATE])])
 
 run_analysis_button = html.Div([
     dmc.Button('Run analysis',
@@ -151,7 +153,7 @@ controls_card = dbc.Card([
 
 wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
 
-modelling_page = dbc.Container([
+layout = dbc.Container([
     dbc.Row([
         dbc.Col(controls_card, md=4),
         dbc.Col(wordcloud_graph, md=8)
@@ -197,7 +199,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
                  time_interval_unit, date_range):
 
     if n_clicks is not None and n_clicks >= 1:
-        input_data = load_data(subreddits, date_range)
+        input_data = load_downloaded_data(subreddits, date_range)
 
         wc = generate_wordcloud(input_data)
 
