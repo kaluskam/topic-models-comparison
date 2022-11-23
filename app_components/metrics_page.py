@@ -22,7 +22,7 @@ metrics = [
     CUCICoherenceMetric(),
     CNPMICoherenceMetric(),
     WECoherencePairwiseMetric(),
-    #WECoherenceCentroidMetric(),
+    WECoherenceCentroidMetric(),
     TopicDiversityMetric(),
     InvertedRBOMetric(),
     LogOddsRatioMetric(),
