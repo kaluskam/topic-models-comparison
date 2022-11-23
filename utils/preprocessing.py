@@ -6,6 +6,7 @@ import copy
 import pandas as pd
 from utils.data_structures import InputData
 import os
+import definitions as d
 
 nltk.download('wordnet', quiet = True)
 nltk.download('omw-1.4', quiet = True)
@@ -73,15 +74,15 @@ class DataPreprocessor:
 
     def read_data(self, subreddit):
         file = subreddit.lower()
-        df = pd.read_csv('../data/raw/' + file + '.csv')
+        df = pd.read_csv(d.RAW_DIR + file + '.csv')
         return df
 
     @staticmethod
     def save(df, subreddit):
-        path = "../data/preprocessed/"
+        path = d.PREPROCESSED_DIR
         if not os.path.exists(path):
             os.mkdir(path)
-        df.to_csv(path + subreddit.lower() + '.csv', index=False, sep=';')
+        df.to_csv(os.join(path, subreddit.lower()) + '.csv', index=False, sep=';')
 
     @staticmethod
     def to_InputDataModel(df, text_column):
