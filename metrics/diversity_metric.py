@@ -30,7 +30,7 @@ class InvertedRBOMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "Inverted RBO"
-        self.description = "Metric calculates average diversity of topic-word lists using Inverted Ranked Biased Overlap" \
+        self.description = "Metric calculates average diversity of topic-word lists using Inverted Ranked Biased Overlap " \
                            "- a method to compare two ranked lists."
         if parameters is None:
             self.init_default_parameters()
@@ -67,7 +67,7 @@ class LogOddsRatioMetric(Metric):
 class WordEmbeddingsInvertedRBOMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         self.name = "Word Embeddings Inverted RBO"
-        self.description = "Metric calculates average pairwise diversity of topic-word vector lists using Inverted Ranked Biased Overlap and embedding model(the default embedding model is word2vec-google-news-300)."
+        self.description = "Metric calculates average pairwise diversity of topic-word vector lists using Inverted Ranked Biased Overlap and embedding model (the default embedding model is word2vec-google-news-300)."
         super().__init__(flag, range, parameters)
         if parameters is None:
             self.init_default_parameters()
@@ -96,7 +96,7 @@ class WordEmbeddingsInvertedRBOCentroidMetric(Metric):
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "Word Embeddings Inverted RBO Centroid"
-        self.description = "Metric calculates average diversity of topic-word vector lists using Inverted Ranked Biased Overlap and embedding model(the default embedding model is word2vec-google-news-300). " \
+        self.description = "Metric calculates average diversity of topic-word vector lists using Inverted Ranked Biased Overlap and embedding model (the default embedding model is word2vec-google-news-300). " \
                            "The diversity is calculated between each word vector list and mean of word vectors for each topic."
         if parameters is None:
             self.init_default_parameters()
