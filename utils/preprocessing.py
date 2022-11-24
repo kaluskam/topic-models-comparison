@@ -82,7 +82,7 @@ class DataPreprocessor:
         path = d.PREPROCESSED_DIR
         if not os.path.exists(path):
             os.mkdir(path)
-        df.to_csv(os.join(path, subreddit.lower()) + '.csv', index=False, sep=';')
+        df.to_csv(os.path.join(path, subreddit.lower()) + '.csv', index=False, sep=';')
 
     @staticmethod
     def to_InputDataModel(df, text_column):
