@@ -49,6 +49,7 @@ class DataPreprocessor:
         return df_copy
 
     def preprocess_text(self, text):
+        text = DataPreprocessor.remove_links(text)
         words = contractions.fix(text.lower())
         words = word_tokenize(words)
         if self.stem:
@@ -74,7 +75,7 @@ class DataPreprocessor:
 
     def read_data(self, subreddit):
         file = subreddit.lower()
-        df = pd.read_csv(d.RAW_DIR + file + '.csv')
+        df = pd.read_csv(os.path.join(d.RAW_DIR, file) + '.csv')
         return df
 
     @staticmethod
@@ -99,3 +100,8 @@ class DataPreprocessor:
     @staticmethod
     def remove_digits(words):
         return [re.sub('\d+', '', word) for word in words]
+
+    @staticmethod
+    def remove_links(text):
+        text = re.sub("https.*", "", text, count=0, flags=0)
+        return re.sub(".*.com", "", text, count=0, flags=0)
