@@ -103,5 +103,5 @@ class DataPreprocessor:
 
     @staticmethod
     def remove_links(text):
-        text = re.sub("https.*", "", text, count=0, flags=0)
-        return re.sub(".*.com", "", text, count=0, flags=0)
+        text = re.sub("(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)", "", text, count=0, flags=0)
+        return text
