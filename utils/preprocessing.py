@@ -18,8 +18,9 @@ from nltk import WordNetLemmatizer
 
 
 STOP_WORDS = stopwords.words('english')
-PUNCTUATION = list(string.punctuation) + ["\"\"", "``", "\'\'"]
+PUNCTUATION = list(string.punctuation)
 STOP_WORDS_PUNCT = set(STOP_WORDS + PUNCTUATION)
+PUNCTUATION_DICT = dict.fromkeys(string.punctuation, '')
 
 
 class DataPreprocessor:
@@ -52,13 +53,13 @@ class DataPreprocessor:
         text = DataPreprocessor.remove_links(text)
         words = contractions.fix(text.lower())
         words = word_tokenize(words)
+        words = DataPreprocessor.remove_stop_words_and_punctuation(words)
+        words = DataPreprocessor.remove_digits(words)
         if self.stem:
             words = [SnowballStemmer('english').stem(word) for word in words]
         if self.lematize:
-            words = [WordNetLemmatizer().lemmatize(word) for word in words]
+            words = [WordNetLemmatizer().lemmatize(word, pos="v") for word in words]
 
-        words = DataPreprocessor.remove_stop_words_and_punctuation(words)
-        words = DataPreprocessor.remove_digits(words)
         return self.remove_short_words(words)
 
     def remove_short_words(self, words):
@@ -95,7 +96,9 @@ class DataPreprocessor:
 
     @staticmethod
     def remove_stop_words_and_punctuation(words):
-        return [word for word in words if word not in STOP_WORDS_PUNCT]
+        words = [word for word in words if word not in STOP_WORDS]
+        return [word.translate(str.maketrans(PUNCTUATION_DICT)) for word in words]
+
 
     @staticmethod
     def remove_digits(words):
