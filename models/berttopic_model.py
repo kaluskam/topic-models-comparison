@@ -6,7 +6,7 @@ import pandas as pd
 from .model import Model
 from utils.data_structures import OutputData
 
-#from bertopic import BERTopic
+from bertopic import BERTopic
 
 
 class BERTopicModel(Model):
