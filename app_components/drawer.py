@@ -102,10 +102,11 @@ controls_card = dbc.Card([
 
 drawer = html.Div(
     [
-        dmc.Button("Open Drawer", id="drawer-demo-button"),
+        dmc.Button("Set analysis options", id="drawer-button",
+                   style={'background-color': '#0d6efd'}),
         dmc.Drawer(
             children=[controls_card],
-            title="Drawer Example",
+            title="Analysis options",
             id="drawer",
             padding="md",
         ),
@@ -115,7 +116,7 @@ drawer = html.Div(
 
 @callback(
     Output("drawer", "opened"),
-    Input("drawer-demo-button", "n_clicks"),
+    Input("drawer-button", "n_clicks"),
     prevent_initial_call=True,
 )
 def drawer_demo(n_clicks):

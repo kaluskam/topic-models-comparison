@@ -4,6 +4,7 @@ import os
 from psaw import PushshiftAPI
 import datetime as dt
 import warnings
+import definitions as d
 
 warnings.filterwarnings('ignore')
 
@@ -12,7 +13,7 @@ class DataDownloader:
     def __init__(self, verbose=False):
         self.verbose = verbose
 
-    def download_data(self, subreddit, start_date="2019-10-01", end_date="2022-10-01",
+    def download_data(self, subreddit, start_date=d.START_DATE, end_date=d.END_DATE,
                       columns=None, saveas=False, return_df=True):
 
         if columns is None:
@@ -55,15 +56,16 @@ class DataDownloader:
         aita_df = aita_df.reset_index(drop=True)
         aita_df = aita_df.rename(columns={"selftext": "text", "created": "date"})
         aita_df = aita_df.sort_values('date')
-        path = "../data/raw/"
+        path = d.RAW_DIR
         if not os.path.exists(path):
             os.mkdir(path)
 
         if saveas and type(saveas) == str:
-            name = "../data/raw/" + saveas + ".csv"
+            name = os.path.join(d.RAW_DIR, saveas) + ".csv"
             aita_df.to_csv(name, index=False)
         elif saveas and type(saveas) == bool:
-            name = "../data/raw/" + subreddit.lower() + ".csv"
+            print('DEBUG')
+            name = os.path.join(d.RAW_DIR, subreddit.lower()) + ".csv"
             aita_df.to_csv(name, index=False)
         if return_df:
             return aita_df

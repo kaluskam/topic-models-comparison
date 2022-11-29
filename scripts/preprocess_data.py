@@ -12,9 +12,9 @@ def preprocess_data(subreddits, columns_df):
         df_stem = preprocessor_stem.preprocess_dataframe(df_lem, text_column=subreddit[1],
                                                          dest_column='stemmed', remove_empty_rows=True)
         processed_df = df_stem.loc[:, ['lematized', 'stemmed', 'date']]
-        preprocessor_lem.save_data(processed_df, subreddit[0])
+        preprocessor_lem.save(processed_df, subreddit[0])
 
-subreddits = ['AskMen', 'AskWomen', 'AmITheAsshole']
-columns_df = [['title', 'text'], ['title', 'text'], ['text']]
+subreddits = ['Movies']
+columns_df = [['title', 'text']]
 
 preprocess_data(subreddits, columns_df)

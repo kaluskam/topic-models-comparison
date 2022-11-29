@@ -6,9 +6,10 @@ import definitions as d
 from utils.data_structures import InputData
 from utils.downloading import DataDownloader
 from utils.preprocessing import DataPreprocessor
+from pathlib import Path
 
 
-def load_downloaded_data(subreddits, date_range):
+def load_downloaded_data(subreddits, date_range, preprocess=True):
     dfs = []
     subreddits.sort()
     input_data_cache_filepath = create_input_data_cache_filepath(subreddits, date_range)
@@ -73,3 +74,28 @@ def download_new_subreddit_and_preprocess(subreddit, date_range):
     df_prep = df_prep.loc[:, ['lematized', 'date']]
     DataPreprocessor.save(df_prep, subreddit)
     return df_prep
+
+
+def load_raw_data(subreddits, date_range): #do użycia w eksploracji danych
+    first = True
+    subreddits = list(map(lambda x: str(x).lower(), subreddits))
+    cwd = Path.cwd()
+    for subreddit in subreddits:
+        src_path = (cwd / f"./data/raw/{subreddit}.csv").resolve()
+        df = pd.read_csv(src_path)
+        df = df.sort_values('date')
+        df.date = pd.to_datetime(df.date)
+        df["raw_text"] = df.title.fillna("") + " " + df.text.fillna("")
+        df = df.loc[:, ['raw_text', 'date']]
+        df['subreddit'] = subreddit
+        if first:
+            result_df = df.loc[
+                       (df['date'] >= date_range[0].__str__()) &
+                       (df['date'] <= date_range[1].__str__()), :]
+            first = False
+        else:
+            result_df = result_df.append(df.loc[
+                       (df['date'] >= date_range[0].__str__()) &
+                       (df['date'] <= date_range[1].__str__()), :])
+    result_df['raw_text'] = result_df['raw_text'].apply(lambda x: DataPreprocessor.remove_links(x))
+    return result_df

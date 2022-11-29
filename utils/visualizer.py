@@ -2,9 +2,11 @@ import plotly.express as px
 import pandas as pd
 import datetime as dt
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from umap import UMAP
 from wordcloud import WordCloud
+from collections import Counter
+import itertools
 import matplotlib.pyplot as plt
 
 FONT = dict(
@@ -146,9 +148,94 @@ def generate_wordcloud(input_data):
     for text in input_data.texts:
         words += ' '.join(text) + ' '
 
-    word_cloud = WordCloud(background_color='white', min_font_size=14, width=1000, height=500).generate(words)
+    word_cloud = WordCloud(background_color='white', min_font_size=14, width=1400, height=600).generate(words)
     wc = px.imshow(word_cloud.to_image())
     wc.update_xaxes(visible=False)
     wc.update_yaxes(visible=False)
     return wc
 
+
+def plot_popular_words(input_data):
+    words = ''
+    for text in input_data.texts:
+        words += ' '.join(text) + ' '
+    word_list = words.replace(']','').replace('[', '').split(sep=' ')
+    word_list = [str(word).replace("'","") for word in word_list]
+    counted_words = Counter(word_list).most_common(10)
+    df = pd.DataFrame(counted_words, columns=['word', 'count']).sort_values('count', ascending=True)
+    return px.bar(df, x="count", y="word", orientation='h', title="Popular words")
+
+
+def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
+    i = 0
+    days_interval = pd.to_datetime(date_range[1]) - pd.to_datetime(date_range[0])
+    days_interval = int(days_interval.days)
+    if aggregation_level == 'default':
+        if days_interval <= 60:
+            aggregation_level = 'daily'
+        elif days_interval <= 365:
+            aggregation_level = 'weekly'
+        else:
+            aggregation_level = 'monthly'
+    subreddits = pd.unique(dfs.subreddit)
+    for subreddit in subreddits:
+        df_counted = dfs.loc[dfs['subreddit'] == subreddit].date.value_counts().reset_index()
+        df_counted.columns = ['date', 'posts number']
+        df_counted = df_counted.sort_values('date').reset_index(drop=True)
+        if aggregation_level == 'weekly':
+            dates = df_counted[df_counted.index // 7 == df_counted.index / 7].date.reset_index(drop=True)
+            df_counted= df_counted.groupby(df_counted.index // 7).sum() #weekly aggreagation
+            df_counted['date'] = dates
+        elif aggregation_level == 'monthly':
+            df_counted.date = pd.to_datetime(df_counted.date.apply(lambda x: x.strftime('%m/%Y')))
+            df_counted = df_counted.groupby('date').sum().reset_index()
+        df_counted['subreddit'] = subreddit
+        if i == 0:
+            fig = px.line(df_counted, x='date', y='posts number', title=f"{aggregation_level.capitalize()} number of posts on subreddit(s)", color='subreddit')
+        else:
+            fig.add_scatter(x=df_counted['date'], y=df_counted['posts number'], mode='lines', name=subreddit)
+        i += 1
+    return fig
+
+
+def get_ngrams(df, column='raw_text', ngram_range=(2,2)):
+    count_vectorizer = CountVectorizer(min_df = 10, stop_words='english', token_pattern = r"[a-zA-Z]{2,}", ngram_range=ngram_range)
+    count_cat = count_vectorizer.fit_transform(df[column])
+    count_feature_names = count_vectorizer.get_feature_names()
+    df_count = pd.DataFrame(count_cat.toarray(), columns=list(count_feature_names))
+    df_count = df_count.sum(axis=0)
+    return dict(sorted(df_count.items(), key=lambda item: item[1], reverse=True))
+
+
+def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
+    word_counters = get_ngrams(df, column, ngram_range)
+    wc = WordCloud(background_color='white', min_font_size=14, width=1000, height=500)
+    word_cloud = wc.generate_from_frequencies(frequencies=word_counters)
+    wc = px.imshow(word_cloud.to_image())
+    wc.update_xaxes(visible=False)
+    wc.update_yaxes(visible=False)
+    return wc
+
+
+def plot_popular_words_stacked(df):
+    subreddits = pd.unique(df.subreddit)
+    first = True
+    for subreddit in subreddits:
+        ngrams = get_ngrams(df.loc[df['subreddit']==subreddit, :], 'raw_text', ngram_range=(2, 2))
+        res = pd.DataFrame(ngrams, index = [0]).T.reset_index()
+        res.columns = ['word', str(subreddit)]
+        if first:
+            result = res
+            first = False
+        else:
+            result = result.merge(res, how='outer')
+    result['count'] = result.loc[:,result.columns != 'word'].sum(axis=1)
+    result = result.sort_values('count', ascending=False).iloc[0:10,:].sort_values('count')
+    return px.bar(result, y="word", x=subreddits, title="Popular bigrams", orientation='h')
+
+
+def plot_word_count_distribution(df, column='raw_text'):
+    a = df[column].apply(lambda x: len(str(x).split(' ')))
+    a = a.sort_values()[0:int(len(a)*0.98)] #delete 1% of extreme cases
+    a.columns = ['number of posts']
+    return px.histogram(a, title = 'Posts word count distribution')

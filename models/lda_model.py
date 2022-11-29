@@ -19,8 +19,9 @@ class LDAModel(Model):
             self.init_default_parameters()
         self.output = None
 
-    def fit(self, data):
-        super().fit(data)
+    def fit(self, data, n_topics = 10):
+        super().fit(data, n_topics)
+        self.parameters["lda"]["num_topics"] = n_topics
         self.data = data
         self.dictionary = Dictionary(data.texts)
         self.dictionary.filter_extremes(**self.parameters["filter_extremes"])

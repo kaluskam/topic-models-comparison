@@ -16,7 +16,7 @@ class BERTopicModel(Model):
         if parameters is None:
             self.init_default_parameters()
 
-    def fit(self, data):
+    def fit(self, data, n_topics = None):
         super().fit(data)
         self.data = data
         bert = BERTopic(**self.parameters["bertopic"])

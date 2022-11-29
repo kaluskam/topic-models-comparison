@@ -26,14 +26,13 @@ navbar = dbc.NavbarSimple(
         drawer
         ],
     brand='Topic models comparison',
-    brand_href='home',
+    brand_href='/home',
     color='primary',
     dark=True
     )
 
 app.layout = dbc.Container([
     navbar,
-    # drawer,
     dash.page_container
 ],
     fluid=True

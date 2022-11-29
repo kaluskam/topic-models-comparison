@@ -6,6 +6,7 @@ import copy
 import pandas as pd
 from utils.data_structures import InputData
 import os
+import definitions as d
 
 nltk.download('wordnet', quiet = True)
 nltk.download('omw-1.4', quiet = True)
@@ -17,8 +18,9 @@ from nltk import WordNetLemmatizer
 
 
 STOP_WORDS = stopwords.words('english')
-PUNCTUATION = list(string.punctuation) + ["\"\"", "``", "\'\'"]
+PUNCTUATION = list(string.punctuation)
 STOP_WORDS_PUNCT = set(STOP_WORDS + PUNCTUATION)
+PUNCTUATION_DICT = dict.fromkeys(string.punctuation, '')
 
 
 class DataPreprocessor:
@@ -48,15 +50,16 @@ class DataPreprocessor:
         return df_copy
 
     def preprocess_text(self, text):
+        text = DataPreprocessor.remove_links(text)
         words = contractions.fix(text.lower())
         words = word_tokenize(words)
+        words = DataPreprocessor.remove_stop_words_and_punctuation(words)
+        words = DataPreprocessor.remove_digits(words)
         if self.stem:
             words = [SnowballStemmer('english').stem(word) for word in words]
         if self.lematize:
-            words = [WordNetLemmatizer().lemmatize(word) for word in words]
+            words = [WordNetLemmatizer().lemmatize(word, pos="v") for word in words]
 
-        words = DataPreprocessor.remove_stop_words_and_punctuation(words)
-        words = DataPreprocessor.remove_digits(words)
         return self.remove_short_words(words)
 
     def remove_short_words(self, words):
@@ -73,15 +76,15 @@ class DataPreprocessor:
 
     def read_data(self, subreddit):
         file = subreddit.lower()
-        df = pd.read_csv('../data/raw/' + file + '.csv')
+        df = pd.read_csv(os.path.join(d.RAW_DIR, file) + '.csv')
         return df
 
     @staticmethod
     def save(df, subreddit):
-        path = "../data/preprocessed/"
+        path = d.PREPROCESSED_DIR
         if not os.path.exists(path):
             os.mkdir(path)
-        df.to_csv(path + subreddit.lower() + '.csv', index=False, sep=';')
+        df.to_csv(os.path.join(path, subreddit.lower()) + '.csv', index=False, sep=';')
 
     @staticmethod
     def to_InputDataModel(df, text_column):
@@ -93,8 +96,15 @@ class DataPreprocessor:
 
     @staticmethod
     def remove_stop_words_and_punctuation(words):
-        return [word for word in words if word not in STOP_WORDS_PUNCT]
+        words = [word for word in words if word not in STOP_WORDS]
+        return [word.translate(str.maketrans(PUNCTUATION_DICT)) for word in words]
+
 
     @staticmethod
     def remove_digits(words):
         return [re.sub('\d+', '', word) for word in words]
+
+    @staticmethod
+    def remove_links(text):
+        text = re.sub("(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)", "", text, count=0, flags=0)
+        return text
