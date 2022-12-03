@@ -9,17 +9,17 @@ import definitions as d
 
 @pytest.fixture
 def subreddit():
-    return 'pushshift'
+    return 'askmen'
 
 
 @pytest.fixture
 def start_date():
-    return dt.date(2022, 10, 1)
+    return '2022-10-01'
 
 
 @pytest.fixture
 def end_date():
-    return dt.date(2022, 10, 5)
+    return '2022-10-03'
 
 
 @pytest.fixture
@@ -43,9 +43,9 @@ def test_column_names(downloaded_df):
 
 def test_column_types(downloaded_df):
     dtypes = downloaded_df.dtypes
-    assert dtypes['title'] == str
-    assert dtypes['text'] == str
-    assert dtypes['date'] == str
+    assert dtypes['title'] == object
+    assert dtypes['text'] == object
+    assert dtypes['date'] == object
 
 
 def test_date_range(downloaded_df, start_date, end_date):
@@ -54,19 +54,3 @@ def test_date_range(downloaded_df, start_date, end_date):
     assert min_date == start_date
     assert max_date == end_date
 
-#
-# def test_downloading(subreddit='askdocs', start_date=dt.date(2022, 10, 1),
-#                      end_date=dt.date(2022, 10, 5)):
-#     assert_file_exists(subreddit)
-#     check_column_names(df)
-#     check_column_types(df)
-#     check_date_range(df, start_date, end_date)
-
-# if __name__ == '__main__':
-#     import pytest
-#     import definitions as d
-#     import os
-#     import datetime as dt
-#     from utils.downloading import DataDownloader
-#     test_downloading('askdocs', dt.date(2022, 10, 1), dt.date(2022, 10, 5))
-#
