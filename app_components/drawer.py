@@ -9,67 +9,45 @@ from utils.dashboard_utils import get_data_for_subreddit_select
 
 subreddit_select = html.Div([
     dmc.MultiSelect(
-        id='subreddits-multiselect',
+        id='drawer-subreddits',
+        class_name='drawer-disabled',
         label='Subreddits',
         data=get_data_for_subreddit_select(),
-        value=['recipes']
+        value=['recipes'],
+        disabled=True
     )]
 )
-
 model_select = html.Div([
     dmc.Select(
-        id='topic-model-select',
+        id='drawer-topic-model-select',
+        class_name='drawer-disabled',
         label='Topic model',
         data=[
             {'label': 'NMF', 'value': 'nmf'},
             {'label': 'LDA', 'value': 'lda'},
             {'label': 'BERTopic', 'value': 'bertopic'}],
-        value='nmf'
+        value='nmf',
+        disabled=True
     )]
 )
-
 n_topics_input_macro = html.Div([
-    dmc.TextInput(id='n-topics-input-macro',
+    dmc.TextInput(id='drawer-n-topics-input-macro',
+                  class_name='drawer-disabled',
                   label='Number of topics for macro analysis',
                   type='number',
-                  value=5)
+                  value=5,
+                  disabled=True)
 ])
-
-n_topics_input_micro = html.Div([
-    dmc.TextInput(id='n-topics-input-micro',
-                  label='Number of topics for micro analysis',
-                  type='number',
-                  description='Type larger number than in macro analysis.\n '
-                              'This will give you insights into more specific topics.',
-                  value=20)
-])
-
-time_interval_radio_buttons = html.Div([
-    dmc.RadioGroup(id='time-interval-radios',
-                   label='Time interval unit',
-                   data=[{'label': 'Day', 'value': 'day'},
-                         {'label': 'Week', 'value': 'week'},
-                         {'label': 'Month', 'value': 'month'},
-                         {'label': 'Year', 'value': 'year'}],
-                   value='month',
-                   size='sm')])
-
 date_range_picker = html.Div([
-    dmc.DateRangePicker(id='date-range-picker',
+    dmc.DateRangePicker(id='drawer-date-range-picker',
                         label='Date range',
+                        class_name='drawer-disabled',
                         minDate=d.START_DATE,
                         maxDate=d.END_DATE,
-                        value=[d.END_DATE - dt.timedelta(days=365), d.END_DATE])])
+                        value=[d.END_DATE - dt.timedelta(days=365), d.END_DATE],
+                        disabled=True)])
 
-run_analysis_button = html.Div([
-    dmc.Button('Run analysis',
-               id='run-analysis-button',
-               variant='light',
-               fullWidth=True,
-               )
-])
-
-controls_card = dbc.Card([
+options_card =dbc.Card([
     html.Div([
         subreddit_select
     ]),
@@ -83,32 +61,21 @@ controls_card = dbc.Card([
     ]),
     dmc.Space(h=10),
     html.Div([
-        n_topics_input_micro
-    ]),
-    dmc.Space(h=10),
-    html.Div([
-        time_interval_radio_buttons
-    ]),
-    dmc.Space(h=10),
-    html.Div([
         date_range_picker
-    ]),
-    dmc.Space(h=10),
-    html.Div([
-        run_analysis_button
     ])
 ],
     body=True)
 
 drawer = html.Div(
     [
-        dmc.Button("Set analysis options", id="drawer-button",
-                   style={'background-color': '#0d6efd'}),
+        dmc.Button("Show chosen options", id="drawer-button",
+                   style={'background-color': '#0d6efd', 'padding-top': '5px'}),
         dmc.Drawer(
-            children=[controls_card],
+            children=[options_card],
             title="Analysis options",
             id="drawer",
             padding="md",
+            size="30%"
         ),
     ]
 )
@@ -121,3 +88,4 @@ drawer = html.Div(
 )
 def drawer_demo(n_clicks):
     return True
+
