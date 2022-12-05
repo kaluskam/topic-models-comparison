@@ -148,11 +148,12 @@ def generate_wordcloud(input_data):
     for text in input_data.texts:
         words += ' '.join(text) + ' '
 
-    word_cloud = WordCloud(background_color='white', min_font_size=14, width=1000, height=500).generate(words)
+    word_cloud = WordCloud(background_color='white', min_font_size=14, width=1400, height=600).generate(words)
     wc = px.imshow(word_cloud.to_image())
     wc.update_xaxes(visible=False)
     wc.update_yaxes(visible=False)
     return wc
+
 
 def plot_popular_words(input_data):
     words = ''
@@ -163,6 +164,7 @@ def plot_popular_words(input_data):
     counted_words = Counter(word_list).most_common(10)
     df = pd.DataFrame(counted_words, columns=['word', 'count']).sort_values('count', ascending=True)
     return px.bar(df, x="count", y="word", orientation='h', title="Popular words")
+
 
 def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
     i = 0
@@ -195,6 +197,7 @@ def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
         i += 1
     return fig
 
+
 def get_ngrams(df, column='raw_text', ngram_range=(2,2)):
     count_vectorizer = CountVectorizer(min_df = 10, stop_words='english', token_pattern = r"[a-zA-Z]{2,}", ngram_range=ngram_range)
     count_cat = count_vectorizer.fit_transform(df[column])
@@ -202,6 +205,7 @@ def get_ngrams(df, column='raw_text', ngram_range=(2,2)):
     df_count = pd.DataFrame(count_cat.toarray(), columns=list(count_feature_names))
     df_count = df_count.sum(axis=0)
     return dict(sorted(df_count.items(), key=lambda item: item[1], reverse=True))
+
 
 def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
     word_counters = get_ngrams(df, column, ngram_range)
@@ -211,6 +215,7 @@ def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
     wc.update_xaxes(visible=False)
     wc.update_yaxes(visible=False)
     return wc
+
 
 def plot_popular_words_stacked(df):
     subreddits = pd.unique(df.subreddit)
@@ -227,6 +232,7 @@ def plot_popular_words_stacked(df):
     result['count'] = result.loc[:,result.columns != 'word'].sum(axis=1)
     result = result.sort_values('count', ascending=False).iloc[0:10,:].sort_values('count')
     return px.bar(result, y="word", x=subreddits, title="Popular bigrams", orientation='h')
+
 
 def plot_word_count_distribution(df, column='raw_text'):
     a = df[column].apply(lambda x: len(str(x).split(' ')))

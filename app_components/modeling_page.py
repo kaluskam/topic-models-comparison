@@ -1,9 +1,9 @@
-import os
 import dash
 import dash_bootstrap_components as dbc
 import dash_mantine_components as dmc
-import pandas as pd
 from dash import dcc, html, Input, Output, callback
+
+import pandas as pd
 import datetime as dt
 
 import definitions as d
@@ -15,6 +15,7 @@ from models.nmf_model import NMFModel
 from models.lda_model import LDAModel
 from models.berttopic_model import BERTopicModel
 
+
 dash.register_page(__name__, path='/modeling')
 
 MODEL_NAMES_DICT = {
@@ -23,7 +24,7 @@ MODEL_NAMES_DICT = {
     'bertopic': BERTopicModel()
 }
 
-default_data = load_downloaded_data(['worldnews'],
+default_data = load_downloaded_data(['recipes'],
                          [d.END_DATE - dt.timedelta(days=365), d.END_DATE])
 default_wordcloud = generate_wordcloud(default_data)
 
@@ -55,7 +56,8 @@ default_overtime_graph_micro = visualise_topics_overtime(r, 'date', output,
 default_topic_similarity_micro = vs.visualize_topics_in_documents(default_data,
                                                                   output,
                                                                   'Topics similarity micro')
-## Components
+
+wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
 
 
 subreddit_select = html.Div([
@@ -63,7 +65,7 @@ subreddit_select = html.Div([
         id='subreddits-multiselect',
         label='Subreddits',
         data=get_data_for_subreddit_select(),
-        value=['worldnews']
+        value=['recipes']
     )]
 )
 
@@ -151,14 +153,12 @@ controls_card = dbc.Card([
 ],
     body=True)
 
-wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
-
 layout = dbc.Container([
+    dmc.Space(h=20),
     dbc.Row([
         dbc.Col(controls_card, md=4),
         dbc.Col(wordcloud_graph, md=8)
-    ],
-        align='center'),
+    ]),
     dbc.Row([
         dbc.Col(dcc.Graph(id='topic-similarity-macro',
                           figure=default_topic_similarity_macro), md=6),
@@ -187,6 +187,10 @@ layout = dbc.Container([
            component_property='figure'),
     Output(component_id='topic-similarity-macro', component_property='figure'),
     Output(component_id='topic-similarity-micro', component_property='figure'),
+    Output(component_id='drawer-subreddits', component_property='value'),
+    Output(component_id='drawer-topic-model-select', component_property='value'),
+    Output(component_id='drawer-n-topics-input-macro', component_property='value'),
+    Output(component_id='drawer-date-range-picker', component_property='value'),
     Input(component_id='run-analysis-button', component_property='n_clicks'),
     Input(component_id='subreddits-multiselect', component_property='value'),
     Input(component_id='topic-model-select', component_property='value'),
@@ -228,7 +232,10 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
                                               time_interval_unit)
         fig_topic_similarity_micro = vs.visualize_topics_in_documents(
             input_data, output, 'Topics similarity micro')
-        return 0, wc, fig_macro, fig_micro, fig_topic_similarity_macro, fig_topic_similarity_micro
+
+        return 0, wc, fig_macro, fig_micro, fig_topic_similarity_macro, \
+               fig_topic_similarity_micro, subreddits, topic_model, \
+               n_topics_macro, date_range
 
     else:
         raise Exception("Doesn't change anything")

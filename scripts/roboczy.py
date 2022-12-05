@@ -5,21 +5,10 @@ from models.berttopic_model import BERTopicModel
 from utils.preprocessing import DataPreprocessor
 from utils.data_structures import InputData
 from utils.visualizer import visualise_topics_overtime
-
+from utils.downloading import DataDownloader
+import datetime as dt
 import pandas as pd
-df = pd.read_csv("..\\data\\preprocessed\\askmen.csv")
-dp = DataPreprocessor(True, False)
-# text_df = dp.preprocess_dataframe(df.loc[1:1000, ], "selftext",
-#                                   "processed_text", True, title_column="title")
-datamodel = InputData()
-datamodel.texts_from_df(df, "lematized")
 
-nmf = NMFModel()
-nmf.fit(datamodel)
-nmf_topics = nmf.get_output()
-# print(nmf.output.texts_topics)
-texts_topics_df = nmf.output.texts_topics
-
-
-r = pd.merge(df, texts_topics_df, left_index=True, right_on='text_id')
-visualise_topics_overtime(r, 'date', nmf.output, 'day')
+dd = DataDownloader(verbose=True)
+df = dd.download_data('pushshift', dt.date(2022, 10, 1), dt.date(2022, 10, 5), return_df=True,
+                      saveas=False)

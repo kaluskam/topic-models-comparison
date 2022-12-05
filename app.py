@@ -4,6 +4,7 @@ from dash import Dash
 import dash_bootstrap_components as dbc
 
 import definitions as d
+from app_components.drawer import drawer
 
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc_css],
@@ -21,10 +22,11 @@ navbar = dbc.NavbarSimple(
         dbc.NavItem(
             dbc.NavLink('Model comparison', href='/metrics')),
         dbc.NavItem(
-            dbc.NavLink('Data Exploration', href='/data-exploration'))
+            dbc.NavLink('Data Exploration', href='/data-exploration')),
+        drawer
         ],
     brand='Topic models comparison',
-    brand_href='home',
+    brand_href='/home',
     color='primary',
     dark=True
     )
