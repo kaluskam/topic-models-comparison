@@ -32,8 +32,9 @@ class BERTopicModel(Model):
             frequency = self.model.get_topic_freq(i)
             self.output.add_topic(words, word_scores, frequency)
 
-            self.output.topic_word_matrix = np.array(self.output.create_topic_word_matrix())
-            return self.output
+        self._match_texts_with_topics()
+        self.output.topic_word_matrix = self.output.create_topic_word_matrix()
+        return self.output
 
     def _match_texts_with_topics(self):
         self.topic_ids = np.array(self.topic_ids) + 1
