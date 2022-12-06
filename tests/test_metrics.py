@@ -39,24 +39,29 @@ def results_dataframe():
 
 
 @pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
-def test_metric_has_name(metric, metricname):
+def test_metric_has_name_and_correct_type(metric, metricname):
     assert metric.name is not None
     assert type(metric.description) == str
 
 @pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
-def test_metric_has_description(metric, metricname):
+def test_metric_has_description_and_correct_type(metric, metricname):
     assert metric.description is not None
     assert type(metric.description) == str
 
 @pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
-def test_metric_has_range(metric, metricname):
+def test_metric_has_range_and_correct_type(metric, metricname):
     assert metric.range is not None
     assert type(metric.range) == tuple
 
 @pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
-def test_metric_has_flag(metric, metricname):
+def test_metric_has_flag_and_correct_type(metric, metricname):
     assert metric.flag is not None
     assert type(metric.flag) == bool
+
+@pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
+def test_metric_has_evaluate_method(metric, metricname):
+    assert metric.evaluate is not None
+    assert callable(metric.evaluate)
 
 @pytest.mark.parametrize("metric, metricname", [(metric, metric_name) for (metric, metric_name) in zip(metrics, metric_names)])
 @pytest.mark.parametrize("model", model_names)
