@@ -20,7 +20,7 @@ class BERTopicModel(Model):
         super().fit(data)
         self.data = data
         bert = BERTopic(**self.parameters["bertopic"])
-        self.topic_ids, _ = bert.fit_transform([" ".join(doc) for doc in data.texts])
+        self.topic_ids, _ = bert.fit_transform([str(text) for text in data.texts])
 
         self.model = bert
 
@@ -32,7 +32,7 @@ class BERTopicModel(Model):
             frequency = self.model.get_topic_freq(i)
             self.output.add_topic(words, word_scores, frequency)
 
-            self.output.topic_word_matrix = self.output.create_topic_word_matrix()
+            self.output.topic_word_matrix = np.array(self.output.create_topic_word_matrix())
             return self.output
 
     def _match_texts_with_topics(self):

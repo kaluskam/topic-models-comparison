@@ -2,22 +2,30 @@ import copy
 
 import pytest
 
-# from models.berttopic_model import BERTopicModel
 from models.lda_model import LDAModel
 from models.nmf_model import NMFModel
-# from models.berttopic_model import BERTopicModel
+from models.berttopic_model import BERTopicModel
 from utils.data_structures import InputData
 import pandas as pd
 import numpy as np
 from utils.data_loading import load_downloaded_data
 import datetime as dt
+import definitions as d
+import os
+import re
 
 
 @pytest.fixture
 def input_data():
-    df = load_downloaded_data(['WorldNews'], date_range=[dt.date(2020, 10, 1),
-                                                         dt.date(2020, 11, 1)])
-    return df
+
+    input_df = pd.read_csv(os.path.join(d.PREPROCESSED_DIR, "worldnews.csv"), sep =";")
+    for col in input_df.columns:
+                if col != 'date':
+                    input_df[col] = input_df[col].apply(lambda x: re.sub('[\'\"\[\],]', '', str(x)))
+    input_df = input_df.head(50)
+    input_data = InputData()
+    input_data.texts_from_df(input_df, "lematized")
+    return input_data
 
 
 @pytest.fixture
@@ -38,7 +46,7 @@ def sample_output_nmf(input_data):
     return output_nmf
 
 
-"""
+
 @pytest.fixture
 def sample_output_bertopic(input_data):
    bert = BERTopicModel()
@@ -46,7 +54,7 @@ def sample_output_bertopic(input_data):
    bert.get_output()
    output_bert = bert.output
    return output_bert
-"""
+
 
 
 def match_types(output):
@@ -62,7 +70,7 @@ def match_types(output):
 def no_missings(output):
     not_missing = []
     not_missing.append(not output.texts_topics.empty)
-    not_missing.append(output.topics_dict != {})
+    not_missing.append(output.topics != [])
     not_missing.append(output.topic_word_matrix.size != 0)
     return all(not_missing) == True
 
@@ -106,10 +114,9 @@ def test_data_types_nmf(sample_output_nmf):
     assert match_types(sample_output_nmf) == True
 
 
-"""
-def test_no_missings_bert(sample_output_bertopic):
-   assert no_missings(sample_output_bertopic) == True
-   
 def test_data_types_bert(sample_output_bertopic):
    assert match_types(sample_output_bertopic) == True
-"""
+
+# def test_no_missings_bert(sample_output_bertopic):
+#    assert no_missings(sample_output_bertopic) == True
+

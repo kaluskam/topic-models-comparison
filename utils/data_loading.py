@@ -22,7 +22,7 @@ def load_downloaded_data(subreddits, date_range, preprocess=True):
             df = pd.read_csv(preprocessed_df_filepath, sep=';')
             for col in df.columns:
                 if col != 'date':
-                    df[col] = df[col].apply(lambda x: str(x).split(', '))
+                    df[col] = df[col].apply(lambda x: re.sub('[\'\"\[\],]', '', str(x)))
         else:
             df = load_raw_data_and_preprocess(subreddit)
         dfs.append(df.loc[

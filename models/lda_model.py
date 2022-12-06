@@ -23,9 +23,9 @@ class LDAModel(Model):
         super().fit(data, n_topics)
         self.parameters["lda"]["num_topics"] = n_topics
         self.data = data
-        self.dictionary = Dictionary(data.texts)
+        self.dictionary = Dictionary([text.split(" ") for text in data.texts])
         self.dictionary.filter_extremes(**self.parameters["filter_extremes"])
-        self.corpus = [self.dictionary.doc2bow(text) for text in data.texts]
+        self.corpus = [self.dictionary.doc2bow(text.split(" ")) for text in data.texts]
         self.model = LdaModel(self.corpus, **self.parameters["lda"])
 
     def get_output(self):
