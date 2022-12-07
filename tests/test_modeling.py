@@ -1,7 +1,7 @@
 import copy
 
 import pytest
-
+import itertools
 from models.lda_model import LDAModel
 from models.nmf_model import NMFModel
 from models.berttopic_model import BERTopicModel
@@ -21,7 +21,7 @@ def input_data():
     for col in input_df.columns:
                 if col != 'date':
                     input_df[col] = input_df[col].apply(lambda x: re.sub('[\'\"\[\],]', '', str(x)))
-    input_df = input_df.head(50)
+    input_df = input_df.head(80)
     input_data = InputData()
     input_data.texts_from_df(input_df, "lematized")
     return input_data
@@ -113,3 +113,15 @@ def test_topics_dict_type(sample_output, model_name):
 @pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
 def test_topics_dict_type(sample_output, model_name):
     assert type(sample_output[model_name].topic_word_matrix) == np.ndarray
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_prob_range(sample_output, model_name):
+    assert (np.min(sample_output[model_name].topic_word_matrix) > 0) & (np.max(sample_output[model_name].topic_word_matrix) < 1)
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_contain_letters_only(sample_output, model_name):
+    all_words = [topic.words for topic in sample_output[model_name].topics]
+    all_words = list(itertools.chain(*all_words))
+    assert all(list(map(lambda x: str.isalpha(x), all_words)))
+
+
