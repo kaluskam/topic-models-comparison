@@ -1,7 +1,6 @@
 import pickle
 import pandas as pd
 import os
-import re
 
 import definitions as d
 from utils.data_structures import InputData
@@ -10,20 +9,14 @@ from utils.preprocessing import DataPreprocessor
 from pathlib import Path
 
 
-def load_downloaded_data(subreddits, date_range, preprocess=True):
+def load_downloaded_data(subreddits, date_range):
     dfs = []
     subreddits.sort()
-    # input_data_cache_filepath = create_input_data_cache_filepath(subreddits, date_range)
-    # if os.path.exists(input_data_cache_filepath):
-    #     return load_cache_input_data(input_data_cache_filepath)
 
     for subreddit in subreddits:
         preprocessed_df_filepath = os.path.join(d.PREPROCESSED_DIR, subreddit + '.csv')
         if os.path.exists(preprocessed_df_filepath):
             df = pd.read_csv(preprocessed_df_filepath, sep=';')
-            for col in df.columns:
-                if col != 'date':
-                    df[col] = df[col].apply(lambda x: re.sub('[\'\"\[\],]', '', str(x)))
         else:
             df = load_raw_data_and_preprocess(subreddit)
         dfs.append(df.loc[
@@ -31,11 +24,8 @@ def load_downloaded_data(subreddits, date_range, preprocess=True):
                    (df['date'] <= date_range[1].__str__()), :])
         final_df = pd.concat(dfs)
         final_df.reset_index(drop=True, inplace=True)
-
-        # filepath = input_data_cache_filepath
     input_data = InputData(df=final_df)
     input_data.texts_from_df(final_df, 'lematized')
-        # input_data.save(filepath)
     return input_data
 
 

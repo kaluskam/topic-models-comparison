@@ -25,7 +25,7 @@ MODEL_NAMES_DICT = {
 }
 
 default_data = load_downloaded_data(['recipes'],
-                         [d.END_DATE - dt.timedelta(days=365), d.END_DATE])
+                         [d.END_DATE - dt.timedelta(days=364), d.END_DATE])
 default_wordcloud = generate_wordcloud(default_data)
 
 vs = Visualizer()
@@ -155,6 +155,11 @@ controls_card = dbc.Card([
 
 layout = dbc.Container([
     dmc.Space(h=20),
+    dmc.Alert(id='alert-modeling',
+              title=d.ALERT_TITLE,
+              children=d.ALERT_MESSAGE,
+              color='red'),
+    dmc.Space(h=20),
     dbc.Row([
         dbc.Col(controls_card, md=4),
         dbc.Col(wordcloud_graph, md=8)
@@ -191,6 +196,7 @@ layout = dbc.Container([
     Output(component_id='drawer-topic-model-select', component_property='value'),
     Output(component_id='drawer-n-topics-input-macro', component_property='value'),
     Output(component_id='drawer-date-range-picker', component_property='value'),
+    Output(component_id='alert-modeling', component_property='hide'),
     Input(component_id='run-analysis-button', component_property='n_clicks'),
     Input(component_id='subreddits-multiselect', component_property='value'),
     Input(component_id='topic-model-select', component_property='value'),
@@ -235,7 +241,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         return 0, wc, fig_macro, fig_micro, fig_topic_similarity_macro, \
                fig_topic_similarity_micro, subreddits, topic_model, \
-               n_topics_macro, date_range
+               n_topics_macro, date_range, True
 
     else:
         raise Exception("Doesn't change anything")
