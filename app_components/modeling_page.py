@@ -10,7 +10,7 @@ import definitions as d
 from utils.dashboard_utils import get_data_for_subreddit_select
 from utils.visualizer import visualise_topics_overtime, generate_wordcloud, \
     Visualizer
-from utils.data_loading import load_downloaded_data
+from utils.data_loading import load_downloaded_data, check_cache_existance, create_output_data_cache_filepath, load_cache_output_data
 from models.nmf_model import NMFModel
 from models.lda_model import LDAModel
 from models.berttopic_model import BERTopicModel
@@ -228,8 +228,15 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             input_data, output, 'Topics similarity macro')
 
         ## MICRO
-        model.fit(input_data, int(n_topics_micro))
-        output = model.get_output()
+        if len(subreddits) == 1 and int(n_topics_micro)==10:
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
+            if cache_exists:
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
+                output = load_cache_output_data(cache_file)
+        else:
+            model.fit(input_data, int(n_topics_micro))
+            output = model.get_output()
+
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
