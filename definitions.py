@@ -9,3 +9,6 @@ CACHE_DIR = os.path.join(ROOT_DIR, 'data', 'cache')
 
 START_DATE = dt.date(2019, 10, 1)
 END_DATE = dt.date(2022, 9, 30)
+
+ALERT_MESSAGE = 'Plots showed below are only exemplary. If you want them to reflect selected options,\n please click the "Run analysis" button.'
+ALERT_TITLE = 'Please click "Run analysis" button'

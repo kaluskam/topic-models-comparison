@@ -19,7 +19,7 @@ class NMFModel(Model):
     def fit(self, data, n_topics=10):
         super().fit(data, n_topics)
         self.data = data
-        tfidf = self.tfidf_vectorizer.fit_transform(data.texts)
+        tfidf = self.tfidf_vectorizer.fit_transform([text.split(" ") for text in data.texts])
         self.parameters['nmf']['n_components'] = n_topics
         self.model = NMF(**self.parameters['nmf'])
         self.W = self.model.fit_transform(tfidf)
@@ -40,7 +40,7 @@ class NMFModel(Model):
             self.output.add_topic(words, word_scores, frequencies[topic])
 
         self._match_texts_with_topics()
-        #self.output.topic_word_matrix = self.output.create_topic_word_matrix()
+        self.output.topic_word_matrix = self.output.create_topic_word_matrix()
 
         return self.output
 
@@ -55,7 +55,5 @@ class NMFModel(Model):
     def init_default_parameters(self):
         self.parameters = {'tfidf': {'preprocessor': ' '.join},
                            'nmf': {'n_components': 5}}
-
-
     def save(self, filepath):
         super().save(filepath)

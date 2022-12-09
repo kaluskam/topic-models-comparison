@@ -14,7 +14,13 @@ class InputData:
         self.df = df
 
     def texts_from_df(self, df, column):
-        self.texts = [value[0] for value in df[[column]].values]
+        if df[column].apply(lambda x: type(x) == str).all():
+            self.texts = df[column].apply(lambda x: x.replace('[', '')
+                                  .replace(']', '')
+                                  .replace("'", '')
+                                  .replace(' ', '').split(','))
+        else:
+            self.texts = [' '.join(value) for value in df[column].values]
 
     def save(self, filepath):
         with open(filepath, 'wb') as file:

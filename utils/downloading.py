@@ -31,7 +31,7 @@ class DataDownloader:
         start_date = int(start_date.timestamp())
         next_epoch = start_date + 86400
         counter = 0
-        aita_df = pd.DataFrame(columns=columns)
+        df = pd.DataFrame(columns=columns)
         for i in range((end_date - start_date) // 86400):
             for post in list(
                     api.search_submissions(before=next_epoch, after=start_date, subreddit=subreddit, limit=200,
@@ -40,7 +40,7 @@ class DataDownloader:
                     continue
                 post = [[getattr(post, att) for att in columns]]
                 post_df = pd.DataFrame(post, columns=columns)
-                aita_df = pd.concat([aita_df, post_df])
+                df = pd.concat([df, post_df])
                 counter += 1
 
             if self.verbose:
@@ -51,21 +51,26 @@ class DataDownloader:
             end_date += 86400
             next_epoch += 86400
 
-        if 'created' in aita_df.columns:
-            aita_df.created = aita_df.created.apply(lambda x: str(dt.date.fromtimestamp(x)))
-        aita_df = aita_df.reset_index(drop=True)
-        aita_df = aita_df.rename(columns={"selftext": "text", "created": "date"})
-        aita_df = aita_df.sort_values('date')
+        if 'created' in df.columns:
+            df.created = df.created.apply(lambda x: str(dt.date.fromtimestamp(x)))
+        # if 'title' in columns:
+        #     df.title = df.title.apply(lambda x: str(x))
+        # if 'selftext' in columns:
+        #     df.selftext = df.selftext.apply(lambda x: str(x))
+        df = df.reset_index(drop=True)
+        df = df.rename(columns={"selftext": "text", "created": "date"})
+        df = df.sort_values('date')
         path = d.RAW_DIR
         if not os.path.exists(path):
             os.mkdir(path)
 
         if saveas and type(saveas) == str:
             name = os.path.join(d.RAW_DIR, saveas) + ".csv"
-            aita_df.to_csv(name, index=False)
+            df.to_csv(name, index=False)
         elif saveas and type(saveas) == bool:
+            print('DEBUG')
             name = os.path.join(d.RAW_DIR, subreddit.lower()) + ".csv"
-            aita_df.to_csv(name, index=False)
+            df.to_csv(name, index=False)
         if return_df:
-            return aita_df
+            return df
         return

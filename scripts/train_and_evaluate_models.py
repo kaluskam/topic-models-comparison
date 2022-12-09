@@ -7,12 +7,12 @@ def create_metrics():
 
 
 def load_data():
-    df = pd.read_csv("..\\data\\askmen_df.csv")
+    df = pd.read_csv("..\\data\\preprocessed\\recipes.csv", sep=';')
     dp = DataPreprocessor(True, False)
-    text_df = dp.preprocess_dataframe(df.loc[1:100, ], "selftext",
-                                      "processed_text", True)
+    # text_df = dp.preprocess_dataframe(df.loc[1:100, ], "selftext",
+    #                                   "processed_text", True)
     datamodel = InputData()
-    datamodel.texts_from_df(text_df, "processed_text")
+    datamodel.texts_from_df(df, "lematized")
     return datamodel
 
 
@@ -39,13 +39,11 @@ def create_bert_topics(datamodel):
 
 def calculate_metrics(datamodel, metrics, topics):
     return [[metric.evaluate(datamodel, topics[0]) for metric in metrics],
-            [metric.evaluate(datamodel, topics[1]) for metric in metrics],
-            [metric.evaluate(datamodel, topics[2]) for metric in metrics]]
+            [metric.evaluate(datamodel, topics[1]) for metric in metrics]]
 
 
 def create_topics(datamodel):
-    return [create_nmf_topics(datamodel), create_lda_topics(datamodel),
-            create_bert_topics(datamodel)]
+    return [create_nmf_topics(datamodel), create_lda_topics(datamodel)]
 
 
 if __name__ == "__main__":
@@ -64,6 +62,6 @@ if __name__ == "__main__":
 
     results = pd.DataFrame(calculate_metrics(datamodel, metrics, topics),
                            columns=["umass", "cv", "cuci", "cnpmi"],
-                           index=["NMF", "LDA", "BERTopic"])
+                           index=["NMF", "LDA"])
 
     print(results)
