@@ -216,8 +216,15 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
         model = MODEL_NAMES_DICT[topic_model]
 
         ## MACRO
-        model.fit(input_data, int(n_topics_macro))
-        output = model.get_output()
+        if len(subreddits) == 1 and int(n_topics_macro)==10:
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
+            if cache_exists:
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
+                output = load_cache_output_data(cache_file)
+        else:
+            model.fit(input_data, int(n_topics_macro))
+            output = model.get_output()
+
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
