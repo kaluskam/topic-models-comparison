@@ -6,6 +6,7 @@ import definitions as d
 from utils.data_structures import InputData
 from utils.downloading import DataDownloader
 from utils.preprocessing import DataPreprocessor
+from utils.dashboard_utils import get_data_for_subreddit_select
 from pathlib import Path
 
 
@@ -93,5 +94,5 @@ def load_raw_data(subreddits, date_range): #do użycia w eksploracji danych
 
 
 if __name__ == '__main__':
-    subreddits = ['recipes']#[filename.replace('.csv', '') for filename in os.listdir(d.RAW_DIR)]
+    subreddits = ['news', 'politics', 'science', 'subredditdrama', 'casualuk']#[filename.replace('.csv', '') for filename in os.listdir(d.RAW_DIR)]
     load_downloaded_data(subreddits=subreddits, date_range=(d.START_DATE, d.END_DATE))
