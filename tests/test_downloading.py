@@ -1,10 +1,6 @@
-import os
-import datetime as dt
-
 import pytest
 
 from utils.downloading import DataDownloader
-import definitions as d
 
 
 @pytest.fixture

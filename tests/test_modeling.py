@@ -1,26 +1,32 @@
 import copy
 
 import pytest
-
-# from models.berttopic_model import BERTopicModel
+import itertools
 from models.lda_model import LDAModel
 from models.nmf_model import NMFModel
-# from models.berttopic_model import BERTopicModel
+from models.berttopic_model import BERTopicModel
 from utils.data_structures import InputData
 import pandas as pd
 import numpy as np
 from utils.data_loading import load_downloaded_data
 import datetime as dt
+import definitions as d
+import os
+import re
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def input_data():
-    df = load_downloaded_data(['WorldNews'], date_range=[dt.date(2020, 10, 1),
-                                                         dt.date(2020, 11, 1)])
-    return df
+    input_df = pd.read_csv(os.path.join(d.PREPROCESSED_DIR, "worldnews.csv"), sep =";")
+    for col in input_df.columns:
+                if col != 'date':
+                    input_df[col] = input_df[col].apply(lambda x: re.sub('[\'\"\[\],]', '', str(x)))
+    input_df = input_df.head(80)
+    input_data = InputData()
+    input_data.texts_from_df(input_df, "lematized")
+    return input_data
 
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def sample_output_lda(input_data):
     lda = LDAModel()
     lda.fit(input_data)
@@ -28,8 +34,7 @@ def sample_output_lda(input_data):
     output_lda = lda.output
     return output_lda
 
-
-@pytest.fixture
+@pytest.fixture(scope="session")
 def sample_output_nmf(input_data):
     nmf = NMFModel()
     nmf.fit(input_data)
@@ -37,35 +42,17 @@ def sample_output_nmf(input_data):
     output_nmf = nmf.output
     return output_nmf
 
-
-"""
-@pytest.fixture
+@pytest.fixture(scope="session")
 def sample_output_bertopic(input_data):
    bert = BERTopicModel()
    bert.fit(input_data)
    bert.get_output()
    output_bert = bert.output
    return output_bert
-"""
 
-
-def match_types(output):
-    types_match = []
-    types_match.append(type(output.texts_topics) == pd.DataFrame)
-    types_match.append(output.documents.__class__ == InputData)
-    types_match.append(type(output.n_topics) == int)
-    types_match.append(type(output.topics_dict) == dict)
-    types_match.append(type(output.topic_word_matrix) == np.ndarray)
-    return all(types_match) == True
-
-
-def no_missings(output):
-    not_missing = []
-    not_missing.append(not output.texts_topics.empty)
-    not_missing.append(output.topics_dict != {})
-    not_missing.append(output.topic_word_matrix.size != 0)
-    return all(not_missing) == True
-
+@pytest.fixture(scope="session")
+def sample_output(sample_output_lda, sample_output_nmf, sample_output_bertopic):
+    return {"LDA": sample_output_lda, "NMF": sample_output_nmf, "BERTopic": sample_output_bertopic}
 
 # Tests
 @pytest.mark.parametrize("model,name1, name2",
@@ -90,26 +77,51 @@ def test_extremas_filtering(input_data, model, name):
         lda.dictionary.cfs.values())
 
 
-def test_no_missings_lda(sample_output_lda):
-    assert no_missings(sample_output_lda) == True
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_matching_text_topic(sample_output, model_name):
+    assert not sample_output[model_name].texts_topics.empty
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_if_topics_found(sample_output, model_name):
+    assert sample_output[model_name].topics != []
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_size_topic_matrix(sample_output, model_name):
+    assert sample_output[model_name].topic_word_matrix.size != 0
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_text_topics_type(sample_output, model_name):
+    assert type(sample_output[model_name].texts_topics) == pd.DataFrame
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_documents_type(sample_output, model_name):
+    assert sample_output[model_name].documents.__class__ == InputData
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_n_topics_type(sample_output, model_name):
+    assert type(sample_output[model_name].n_topics) == int
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_n_topics_type(sample_output, model_name):
+    assert type(sample_output[model_name].n_topics) == int
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_dict_type(sample_output, model_name):
+    assert type(sample_output[model_name].n_topics) == dict
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_dict_type(sample_output, model_name):
+    assert type(sample_output[model_name].topic_word_matrix) == np.ndarray
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_prob_range(sample_output, model_name):
+    assert (np.min(sample_output[model_name].topic_word_matrix) > 0) & (np.max(sample_output[model_name].topic_word_matrix) < 1)
+
+@pytest.mark.parametrize("model_name", ["LDA", "NMF", "BERTopic"])
+def test_topics_contain_letters_only(sample_output, model_name):
+    all_words = [topic.words for topic in sample_output[model_name].topics]
+    all_words = list(itertools.chain(*all_words))
+    assert all(list(map(lambda x: str.isalpha(x), all_words)))
 
 
-def test_no_missings_nmf(sample_output_nmf):
-    assert no_missings(sample_output_nmf) == True
-
-
-def test_data_types_lda(sample_output_lda):
-    assert match_types(sample_output_lda) == True
-
-
-def test_data_types_nmf(sample_output_nmf):
-    assert match_types(sample_output_nmf) == True
-
-
-"""
-def test_no_missings_bert(sample_output_bertopic):
-   assert no_missings(sample_output_bertopic) == True
-   
-def test_data_types_bert(sample_output_bertopic):
-   assert match_types(sample_output_bertopic) == True
-"""
