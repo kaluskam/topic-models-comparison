@@ -70,6 +70,10 @@ class OutputData:
         topics_word_matrix = np.array(all_probs).astype(float)
         return topics_word_matrix
 
+    def save(self, filepath):
+        with open(filepath, 'wb') as file:
+            pickle.dump(self, file)
+
 
 class Topic:
     """
