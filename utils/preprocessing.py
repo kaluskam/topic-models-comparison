@@ -8,8 +8,9 @@ from utils.data_structures import InputData
 import os
 import definitions as d
 
-nltk.download('wordnet', quiet = True)
-nltk.download('omw-1.4', quiet = True)
+nltk.download('wordnet', quiet=True)
+nltk.download('omw-1.4', quiet=True)
+nltk.download('punkt', quiet=True)
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -29,7 +30,7 @@ class DataPreprocessor:
         self.stem = stem
         self.min_word_len = min_word_len
 
-    def preprocess_dataframe(self, df, text_column, dest_column, remove_empty_rows, inplace=False):
+    def preprocess_dataframe(self, df, text_column, dest_column, remove_empty_rows=True, inplace=False):
         
         if inplace:
             df_copy = df
@@ -46,11 +47,13 @@ class DataPreprocessor:
 
         df_copy[dest_column] = initial_text.apply(lambda text: self.preprocess_text(text)) #df_copy[text_column[0]]
         if remove_empty_rows:
-            df_copy = df_copy[df_copy[dest_column] != '']
+            df_copy = df_copy[df_copy[dest_column].apply(lambda x: type(x) == list)]
+            df_copy = df_copy[df_copy[dest_column].apply(lambda x: len(x)) > 0]
         return df_copy
 
     def preprocess_text(self, text):
         text = DataPreprocessor.remove_links(text)
+        text = DataPreprocessor.keep_ascii_only(text)
         words = contractions.fix(text.lower())
         words = word_tokenize(words)
         words = DataPreprocessor.remove_stop_words_and_punctuation(words)
@@ -99,7 +102,6 @@ class DataPreprocessor:
         words = [word for word in words if word not in STOP_WORDS]
         return [word.translate(str.maketrans(PUNCTUATION_DICT)) for word in words]
 
-
     @staticmethod
     def remove_digits(words):
         return [re.sub('\d+', '', word) for word in words]
@@ -108,3 +110,7 @@ class DataPreprocessor:
     def remove_links(text):
         text = re.sub("(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)", "", text, count=0, flags=0)
         return text
+
+    @staticmethod
+    def keep_ascii_only(text):
+        return text.encode('ascii', errors='ignore').decode()

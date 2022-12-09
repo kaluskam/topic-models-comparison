@@ -29,13 +29,6 @@ def downloaded_df(subreddit, start_date, end_date):
     return df
 
 
-# @pytest.mark.special
-# def test_file_exists(subreddit):
-#     filepath = os.path.join(d.RAW_DIR, subreddit + '.csv')
-#     print(filepath)
-#     assert os.path.exists(filepath)
-
-
 def test_column_names(downloaded_df):
     assert len(downloaded_df.columns) == 3
     assert {'title', 'text', 'date'} == set(downloaded_df.columns)
