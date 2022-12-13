@@ -29,12 +29,16 @@ def load_downloaded_data(subreddits, date_range):
     return input_data
 
 
-def create_input_data_cache_filepath(subreddits, date_range):
-    filename = '_'.join(subreddits) + '&' + str(date_range[0]) + '_' + str(date_range[1]) + '.obj'
+def create_output_data_cache_filepath(subreddit, date_range, model_alias):
+    filename = str(subreddit) + '&' + str(date_range[0]) + '_' + str(date_range[1]) + '&'+ str(model_alias) +'.obj'
     return os.path.join(d.CACHE_DIR, filename)
 
+def check_cache_existance(subreddit, date_range, model_alias):
+    cached_df = pd.read_csv(os.path.join(d.CACHE_DIR, 'cached_files.csv'))
+    return not cached_df.loc[(cached_df['subreddit'] == subreddit) & (cached_df['date_range_0'] == date_range[0]) & (cached_df['date_range_1'] == date_range[1]) & (cached_df['model'] == model_alias), :].empty
 
-def load_cache_input_data(filepath):
+
+def load_cache_output_data(filepath):
     with open(filepath, 'rb') as file:
         return pickle.load(file)
 
