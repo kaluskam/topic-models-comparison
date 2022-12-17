@@ -53,7 +53,7 @@ class Visualizer:
                          size="Size",
                          size_max=40,
                          template="simple_white",
-                         labels={"x": "", "y": ""},
+                         labels={"x": "UMAP component 1", "y": "UMAP component 2"},
                          hover_data={"Topic": True,
                                      "Texts": True,
                                      "Size": False,
@@ -163,7 +163,11 @@ def plot_popular_words(input_data):
     word_list = [str(word).replace("'","") for word in word_list]
     counted_words = Counter(word_list).most_common(10)
     df = pd.DataFrame(counted_words, columns=['word', 'count']).sort_values('count', ascending=True)
-    return px.bar(df, x="count", y="word", orientation='h', title="Popular words")
+    fig = px.bar(df, x="count", y="word", orientation='h', title="Popular words")
+    fig.update_layout(
+        plot_bgcolor='rgba(237, 250, 253, 0.5)',
+        font=FONT)
+    return fig
 
 
 def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
@@ -195,6 +199,9 @@ def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
         else:
             fig.add_scatter(x=df_counted['date'], y=df_counted['posts number'], mode='lines', name=subreddit)
         i += 1
+        fig.update_layout(
+            plot_bgcolor='rgba(237, 250, 253, 0.5)',
+            font=FONT)
     return fig
 
 
@@ -231,11 +238,19 @@ def plot_popular_words_stacked(df):
             result = result.merge(res, how='outer')
     result['count'] = result.loc[:,result.columns != 'word'].sum(axis=1)
     result = result.sort_values('count', ascending=False).iloc[0:10,:].sort_values('count')
-    return px.bar(result, y="word", x=subreddits, title="Popular bigrams", orientation='h')
+    fig = px.bar(result, y="word", x=subreddits, title="Popular bigrams", orientation='h')
+    fig.update_layout(
+        plot_bgcolor='rgba(237, 250, 253, 0.5)',
+        font=FONT)
+    return fig
 
 
 def plot_word_count_distribution(df, column='raw_text'):
     a = df[column].apply(lambda x: len(str(x).split(' ')))
     a = a.sort_values()[0:int(len(a)*0.98)] #delete 1% of extreme cases
     a.columns = ['number of posts']
-    return px.histogram(a, title = 'Posts word count distribution')
+    fig = px.histogram(a, title='Posts word count distribution')
+    fig.update_layout(
+        plot_bgcolor='rgba(237, 250, 253, 0.5)',
+        font=FONT)
+    return fig

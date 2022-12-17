@@ -112,7 +112,7 @@ date_range_picker = html.Div([
                         label='Date range',
                         minDate=d.START_DATE,
                         maxDate=d.END_DATE,
-                        value=[d.END_DATE - dt.timedelta(days=365), d.END_DATE])])
+                        value=[d.END_DATE - dt.timedelta(days=364), d.END_DATE])])
 
 run_analysis_button = html.Div([
     dmc.Button('Run analysis',
