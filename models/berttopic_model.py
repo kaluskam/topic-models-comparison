@@ -10,7 +10,9 @@ from bertopic import BERTopic
 
 
 class BERTopicModel(Model):
-
+    """
+    Implementation of a BERTopic model. Extends abstract Model class.
+    """
     def __init__(self, parameters=None):
         super().__init__(parameters)
         if parameters is None:
