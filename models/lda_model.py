@@ -10,7 +10,7 @@ from gensim.models.ldamodel import LdaModel
 
 class LDAModel(Model):
     """
-    Brzydka i niekompletna wstępna implemetacja przykładowego modelu.
+    Implementation of a Latent Dirichlet Allocation model from gensim library. Extends abstract Model class.
     """
 
     def __init__(self, parameters=None):

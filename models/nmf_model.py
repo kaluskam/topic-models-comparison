@@ -8,7 +8,9 @@ from utils.data_structures import OutputData
 
 
 class NMFModel(Model):
-
+    """
+    Implementation of Non-negative Matrix Factorization model from sklearn library. Extends abstract Model class.
+    """
     def __init__(self, parameters=None):
         super().__init__(parameters)
         if parameters is None:

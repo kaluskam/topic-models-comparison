@@ -2,6 +2,9 @@ from metrics.metric import Metric
 from octis.evaluation_metrics.topic_significance_metrics import *
 
 class KLUniformMetric(Metric):
+    """
+    A class to calculate Kullback-Leiber Unifrom metric.
+    """
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         super().__init__(flag, range, parameters)
         self.name = "KL Uniform"
@@ -11,12 +14,22 @@ class KLUniformMetric(Metric):
             self.init_default_parameters()
 
     def evaluate(self, inputData, outputData):
+        """
+        Retrieve the score of the metric
+
+        Returns
+        -------
+        float : Kullback-Leiber distance calculated on topic-word probability matrix
+        """
         super().evaluate(inputData, outputData)
         kl_uniform = KL_uniform()
         topics_dict = {"topic-word-matrix": outputData.topic_word_matrix}
         return kl_uniform.score(topics_dict)
 
 class KLBackgroundMetric(Metric):
+    """
+    A class to calculate Kullback-Leiber Background metric.
+    """
     def __init__(self, flag=False, range=(0, 1), parameters=None):
         self.name = "KL Background"
         self.description = "Kl Background metric is used to investigate the distribution of topics over documents using Kullback-Leiber distance. " \
@@ -26,6 +39,13 @@ class KLBackgroundMetric(Metric):
             self.init_default_parameters()
 
     def evaluate(self, inputData, outputData):
+        """
+        Retrieve the score of the metric
+
+        Returns
+        -------
+        float : Kullback-Leiber distance calculated on topic-document probability matrix
+        """
         super().evaluate(inputData, outputData)
         kl_background = KL_background()
         topics_dict = {"topic-document-matrix" : np.array(outputData.texts_topics)}
