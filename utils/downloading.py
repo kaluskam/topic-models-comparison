@@ -10,18 +10,39 @@ warnings.filterwarnings('ignore')
 
 
 class DataDownloader:
+    """
+    Download posts from chosen subreddits and time range via Pushshift API
+    """
     def __init__(self, verbose=False):
         self.verbose = verbose
 
     def download_data(self, subreddit, start_date=d.START_DATE, end_date=d.END_DATE,
                       columns=None, saveas=False, return_df=True):
+        """
+        Download and save the posts from subreddits
+
+        Parameters
+        ----------
+        subreddit : str
+            subreddit to download
+        start_date: DateTime
+            first date from which the post should be downloaded
+        end_date: DateTime
+            last date to which the post should be downloaded
+        columns: list of str
+            columns to be included in the downloaded dataframe, be default 'title', 'selftext', 'created'
+        saveas: bool
+            choose whether to save the result dataframe in the raw directory
+        return_df: bool
+            choose whether to return the DataFrame object as a result of a function invoke
+        """
 
         if columns is None:
             columns = ['title', 'selftext', 'created']
 
-        reddit = praw.Reddit(client_id='ha7wPvCUY_DurA',
-                             client_secret='B98E34rnXS-Qw6Fg4eOwHUpIupQ',
-                             user_agent='aita_scrapper'
+        reddit = praw.Reddit(client_id='ha7wPvCUY_DurA', #  H_e4xc9p7tEXUoYj7BjLrw kZUFktG61cWUzjP6CbX1dg
+                             client_secret='B98E34rnXS-Qw6Fg4eOwHUpIupQ', #  -f0UwwoDqiODOZhhx48WuJG_tCKOCg FsBhq-JaYn79pFhMOiOtW8FGwoQN7A
+                             user_agent='aita_scrapper' # aita_scrapper news_scrapper_app
                              )
         api = PushshiftAPI(reddit)
         rem_or_del = ['[removed]', '[deleted]']
@@ -63,13 +84,14 @@ class DataDownloader:
         path = d.RAW_DIR
         if not os.path.exists(path):
             os.mkdir(path)
-
+        print("test")
         if saveas and type(saveas) == str:
             name = os.path.join(d.RAW_DIR, saveas) + ".csv"
             df.to_csv(name, index=False)
         elif saveas and type(saveas) == bool:
             print('DEBUG')
             name = os.path.join(d.RAW_DIR, subreddit.lower()) + ".csv"
+            print(name)
             df.to_csv(name, index=False)
         if return_df:
             return df

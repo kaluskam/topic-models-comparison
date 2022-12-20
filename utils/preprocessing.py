@@ -25,13 +25,34 @@ PUNCTUATION_DICT = dict.fromkeys(string.punctuation, '')
 
 
 class DataPreprocessor:
+    """
+    Class to preprocess raw text from a dataframe
+    """
     def __init__(self, lematize=True, stem=False, min_word_len=2):
         self.lematize = lematize
         self.stem = stem
         self.min_word_len = min_word_len
 
     def preprocess_dataframe(self, df, text_column, dest_column, remove_empty_rows=True, inplace=False):
-        
+        """
+        Parameters
+        ----------
+        df : DataFrame
+            dataframe containing posts from a subreddit
+        text_column: str
+            column name from which the text will be preprocessed
+        dest_column: str
+            destination column for preprocessed text
+        remove_empty_rows: bool
+            indicates whether to remove empty rows
+        inplace: bool
+            indicates whether to perform preprocessing on input dataframe or a copy
+
+        Returns
+        -------
+        df_copy = DataFrame
+            dataframe containing column with preprocessed text
+        """
         if inplace:
             df_copy = df
         else:
@@ -52,6 +73,20 @@ class DataPreprocessor:
         return df_copy
 
     def preprocess_text(self, text):
+        """
+        Method to conduct all steps of text preprocessing: links removal, keeping only ASCII symbols,
+        stop words removal, punctuation removal etc.
+
+        Parameters
+        ----------
+        text : str
+            text from a subreddit post
+
+        Returns
+        -------
+        words : list of str
+            words after preprocessing
+        """
         text = DataPreprocessor.remove_links(text)
         text = DataPreprocessor.keep_ascii_only(text)
         words = contractions.fix(text.lower())
@@ -69,6 +104,21 @@ class DataPreprocessor:
         return [word for word in words if len(word) >= self.min_word_len]
 
     def paste_columns(self, df_copy, text_column):
+        """
+        Method to paste the text from different columns, usually title and text of a post
+
+        Parameters
+        ----------
+        df_copy : DataFrame
+            reference dataframe
+        text_column: list of str
+            columns to be pasted together
+
+        Returns
+        -------
+        initial_text: list
+            initial text merged with the text from specified columns
+        """
         initial_text = df_copy[text_column[0]]
         for i in range(len(text_column) - 1):
             df_copy[text_column[i + 1]] = df_copy[text_column[i + 1]].apply(
@@ -78,6 +128,9 @@ class DataPreprocessor:
         return initial_text
 
     def read_data(self, subreddit):
+        """
+        Read the dataframe from raw directory by specifying the subreddit name
+        """
         file = subreddit.lower()
         df = pd.read_csv(os.path.join(d.RAW_DIR, file) + '.csv')
         return df

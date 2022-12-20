@@ -15,6 +15,9 @@ FONT = dict(
         )
 
 class Visualizer:
+    """
+   Class which wraps up together methods for creating the visualizations
+   """
     def __init__(self, parameters=None):
         self.parameters = parameters
         if parameters is None:
@@ -31,6 +34,23 @@ class Visualizer:
         return fig
 
     def visualize_topics_in_documents(self, inputData, outputData, title):
+        """
+        Method to visualize topic clusters using UMAP. Can be used to choose the optimal number of topic.
+
+        Parameters
+        ----------
+        inputData : InputData
+            input data of a model
+        outputData: OutputData
+            output data of a model
+        title: str
+            title of a plot
+
+        Returns
+        -------
+        fig: plotly.graph_objs._figure.Figure
+            scatter plot
+        """
         self.tfidf = TfidfVectorizer(**self.parameters["tfidf"])
         self.tfidf.fit(inputData.texts)
         topics = [topic.words for topic in outputData.topics]
@@ -72,6 +92,27 @@ class Visualizer:
 
 
 def visualise_topics_overtime(df, date_column, outputdata, title, interval='month'):
+    """
+        Method to visualize topics over time with a selected granularity.
+
+        Parameters
+        ----------
+        df : DataFrame
+            reference dataframe
+        date_column: str
+            column containing posts creation date
+        outputdata: OutputData
+            output data of a model
+        title: str
+            title of a plot
+        interval: str
+            granularity of topics over time visualization
+
+        Returns
+        -------
+        fig: plotly.graph_objs._figure.Figure
+            line chart
+        """
     xaxis_title = ''
     ticktext = []
     tickformat = None
@@ -144,6 +185,9 @@ def visualise_topics_overtime(df, date_column, outputdata, title, interval='mont
 
 
 def generate_wordcloud(input_data):
+    """
+    Create a wordcloud using words from InputData object
+    """
     words = ''
     for text in input_data.texts:
         words += ' '.join(text) + ' '
@@ -156,6 +200,9 @@ def generate_wordcloud(input_data):
 
 
 def plot_popular_words(input_data):
+    """
+    Plot top 10 most popular words for a given InputData object instance
+    """
     words = ''
     for text in input_data.texts:
         words += ' '.join(text) + ' '
@@ -171,6 +218,9 @@ def plot_popular_words(input_data):
 
 
 def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
+    """
+    Plot number of posts for a selected granularity level. Can be used for checking data representativeness over a selected period.
+    """
     i = 0
     days_interval = pd.to_datetime(date_range[1]) - pd.to_datetime(date_range[0])
     days_interval = int(days_interval.days)
@@ -206,6 +256,9 @@ def plot_posts_distribution(dfs, date_range, aggregation_level='default'):
 
 
 def get_ngrams(df, column='raw_text', ngram_range=(2,2)):
+    """
+    Retrieve the ngrams (bigrams by default). Part of a data exploration analysis.
+    """
     count_vectorizer = CountVectorizer(min_df = 10, stop_words='english', token_pattern = r"[a-zA-Z]{2,}", ngram_range=ngram_range)
     count_cat = count_vectorizer.fit_transform(df[column])
     count_feature_names = count_vectorizer.get_feature_names()
@@ -215,6 +268,9 @@ def get_ngrams(df, column='raw_text', ngram_range=(2,2)):
 
 
 def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
+    """
+    Plot word cloud for ngrams (bigrams by default). Part of a data exploration analysis.
+    """
     word_counters = get_ngrams(df, column, ngram_range)
     wc = WordCloud(background_color='white', min_font_size=14, width=1000, height=500)
     word_cloud = wc.generate_from_frequencies(frequencies=word_counters)
@@ -225,6 +281,9 @@ def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
 
 
 def plot_popular_words_stacked(df):
+    """
+    Plot popular words with respect to their subreddit origin.
+    """
     subreddits = pd.unique(df.subreddit)
     first = True
     for subreddit in subreddits:
@@ -246,6 +305,9 @@ def plot_popular_words_stacked(df):
 
 
 def plot_word_count_distribution(df, column='raw_text'):
+    """
+    Plot distribution of number of words inside a post. Part of a data exploration analysis.
+    """
     a = df[column].apply(lambda x: len(str(x).split(' ')))
     a = a.sort_values()[0:int(len(a)*0.98)] #delete 1% of extreme cases
     a.columns = ['number of posts']
