@@ -132,9 +132,17 @@ class OutputData:
         metrics_list: list of Metric objects
             metrics to be calculated
         """
+        tmp_dict = {}
         for metric in metrics_list:
-            metrics_result = metric.evaluate(self.documents, self)
-            self.metrics_dict[metric.name] = metrics_result
+            print(f"doing {metric.name}")
+            try:
+                metrics_result = metric.evaluate(self.documents, self)
+            except Exception:
+                pass
+            if metrics_result is None:
+                metrics_result = None
+            tmp_dict[metric.name] = metrics_result
+        self.metrics_dict.update(tmp_dict)
 
     def save(self, filepath):
         """

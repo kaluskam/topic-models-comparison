@@ -26,7 +26,7 @@ navbar = dbc.NavbarSimple(
         drawer
     ],
     brand='Topic models comparison',
-    brand_href='/home',
+    brand_href='/',
     color='primary',
     dark=True
 )

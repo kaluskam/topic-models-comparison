@@ -74,7 +74,8 @@ controls_card = dbc.Card([
 ],
     body=True)
 
-wordcloud_graph = dcc.Graph(id='wordcloud', figure=default_wordcloud)
+wordcloud_graph = dcc.Graph(id='wordcloud', figure=default_wordcloud,
+                          config={"staticPlot": True})
 common_words_graph = dcc.Graph(id='popular-words', figure=default_popular_words)
 common_bigrams_graph = dcc.Graph(id='popular-bigrams', figure=default_popular_bigrams)
 posts_number = dcc.Graph(id='posts-number', figure=default_posts_num_dist)

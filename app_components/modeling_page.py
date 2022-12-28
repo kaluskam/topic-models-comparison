@@ -57,7 +57,8 @@ default_topic_similarity_micro = vs.visualize_topics_in_documents(default_data,
                                                                   output,
                                                                   'Topics similarity micro')
 
-wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud)
+wordcloud_graph = dcc.Graph(id='wordcloud-graph', figure=default_wordcloud,
+                          config={"staticPlot": True})
 
 
 subreddit_select = html.Div([
@@ -216,14 +217,20 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
         model = MODEL_NAMES_DICT[topic_model]
 
         ## MACRO
-        if len(subreddits) == 1 and int(n_topics_macro)==10:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
+        if len(subreddits) == 1:
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro)
             if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro)
                 output = load_cache_output_data(cache_file)
+            else:
+                model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
+                model.fit(input_data, model_topics)
+                output = model.get_output()
         else:
-            model.fit(input_data, int(n_topics_macro))
-            output = model.get_output()
+                model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
+                model.fit(input_data, model_topics)
+                output = model.get_output()
+
 
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
@@ -235,13 +242,18 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             input_data, output, 'Topics similarity macro')
 
         ## MICRO
-        if len(subreddits) == 1 and int(n_topics_micro)==10:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
+        if len(subreddits) == 1:
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro)
             if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro)
                 output = load_cache_output_data(cache_file)
+            else:
+                model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
+                model.fit(input_data, model_topics)
+                output = model.get_output()
         else:
-            model.fit(input_data, int(n_topics_micro))
+            model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
+            model.fit(input_data, model_topics)
             output = model.get_output()
 
         texts_topics_df = output.texts_topics

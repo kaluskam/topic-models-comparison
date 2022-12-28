@@ -106,7 +106,6 @@ class LogOddsRatioMetric(Metric):
         super().evaluate(inputData, outputData)
         log_odds_ratio = LogOddsRatio()
         topics_word_dict = {"topic-word-matrix": outputData.topic_word_matrix}
-        print(outputData.topic_word_matrix)
         return log_odds_ratio.score(topics_word_dict)
 
 

@@ -1,9 +1,7 @@
 from utils.data_structures import *
 from metrics.metric import Metric
 
-from gensim.models.coherencemodel import CoherenceModel
-from gensim.corpora.dictionary import Dictionary
-from octis.evaluation_metrics.coherence_metrics import WECoherencePairwise, WECoherenceCentroid
+from octis.evaluation_metrics.coherence_metrics import WECoherencePairwise, WECoherenceCentroid, Coherence
 
 
 class UMassCoherenceMetric(Metric):
@@ -28,20 +26,12 @@ class UMassCoherenceMetric(Metric):
 
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
-        topics = outputData.get_topics()
-        dictionary = Dictionary(inputData.texts)
-        corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
-
-        cm = CoherenceModel(topics=topics,
-                            texts=inputData.texts,
-                            dictionary=dictionary,
-                            corpus=corpus,
-                            coherence="u_mass",
-                            **self.parameters["coherencemodel"])
-        return cm.get_coherence()
+        coherence_umass = Coherence(texts = list(inputData.texts), **self.parameters["coherencemodel"])
+        topics_dict = {"topics": outputData.get_topics()}
+        return coherence_umass.score(topics_dict)
 
     def init_default_parameters(self):
-        self.parameters = {"coherencemodel": {}}
+        self.parameters = {"coherencemodel": {"measure": "u_mass"}}
 
 
 class CVCoherenceMetric(Metric):
@@ -73,20 +63,12 @@ class CVCoherenceMetric(Metric):
 
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
-        topics = outputData.get_topics()
-        dictionary = Dictionary(inputData.texts)
-        corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
-
-        cm = CoherenceModel(topics=topics,
-                            texts=inputData.texts,
-                            dictionary=dictionary,
-                            corpus=corpus,
-                            coherence="c_v",
-                            **self.parameters["coherencemodel"])
-        return cm.get_coherence()
+        coherence_umass = Coherence(texts = list(inputData.texts), **self.parameters["coherencemodel"])
+        topics_dict = {"topics": outputData.get_topics()}
+        return coherence_umass.score(topics_dict)
 
     def init_default_parameters(self):
-        self.parameters = {"coherencemodel": {}}
+        self.parameters = {"coherencemodel": {"measure": "c_v"}}
 
 
 class CUCICoherenceMetric(Metric):
@@ -115,20 +97,12 @@ class CUCICoherenceMetric(Metric):
 
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
-        topics = outputData.get_topics()
-        dictionary = Dictionary(inputData.texts)
-        corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
-
-        cm = CoherenceModel(topics=topics,
-                            texts=inputData.texts,
-                            dictionary=dictionary,
-                            corpus=corpus,
-                            coherence="c_uci",
-                            **self.parameters["coherencemodel"])
-        return cm.get_coherence()
+        coherence_umass = Coherence(texts = list(inputData.texts), **self.parameters["coherencemodel"])
+        topics_dict = {"topics": outputData.get_topics()}
+        return coherence_umass.score(topics_dict)
 
     def init_default_parameters(self):
-        self.parameters = {"coherencemodel": {}}
+        self.parameters = {"coherencemodel": {"measure": "c_uci"}}
 
 
 class CNPMICoherenceMetric(Metric):
@@ -157,20 +131,12 @@ class CNPMICoherenceMetric(Metric):
 
     def evaluate(self, inputData, outputData):
         super().evaluate(inputData, outputData)
-        topics = outputData.get_topics()
-        dictionary = Dictionary(inputData.texts)
-        corpus = [dictionary.doc2bow(doc) for doc in inputData.texts]
-
-        cm = CoherenceModel(topics=topics,
-                            texts=inputData.texts,
-                            dictionary=dictionary,
-                            corpus=corpus,
-                            coherence="c_npmi",
-                            **self.parameters["coherencemodel"])
-        return cm.get_coherence()
+        coherence_umass = Coherence(texts = list(inputData.texts), **self.parameters["coherencemodel"])
+        topics_dict = {"topics": outputData.get_topics()}
+        return coherence_umass.score(topics_dict)
 
     def init_default_parameters(self):
-        self.parameters = {"coherencemodel": {}}
+        self.parameters = {"coherencemodel": {"measure": "c_npmi"}}
 
 
 class WECoherencePairwiseMetric(Metric):

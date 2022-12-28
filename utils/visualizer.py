@@ -194,10 +194,10 @@ def generate_wordcloud(input_data):
 
     word_cloud = WordCloud(background_color='white', min_font_size=14, width=1400, height=600).generate(words)
     wc = px.imshow(word_cloud.to_image())
+    wc.update_traces(hovertemplate=None, hoverinfo="skip")
     wc.update_xaxes(visible=False)
     wc.update_yaxes(visible=False)
     return wc
-
 
 def plot_popular_words(input_data):
     """
@@ -275,6 +275,7 @@ def plot_wordcloud(df, column='raw_text', ngram_range=(2, 2)):
     wc = WordCloud(background_color='white', min_font_size=14, width=1000, height=500)
     word_cloud = wc.generate_from_frequencies(frequencies=word_counters)
     wc = px.imshow(word_cloud.to_image())
+    wc.update_traces(hovertemplate=None, hoverinfo="skip")
     wc.update_xaxes(visible=False)
     wc.update_yaxes(visible=False)
     return wc
