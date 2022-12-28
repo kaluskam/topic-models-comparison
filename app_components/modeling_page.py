@@ -255,6 +255,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
             model.fit(input_data, model_topics)
             output = model.get_output()
+            print("Topic analysis micro not from cache")
 
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,

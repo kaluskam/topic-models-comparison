@@ -5,9 +5,8 @@ from models.lda_model import LDAModel
 from models.nmf_model import NMFModel
 import os
 import pandas as pd
+import hdbscan
 import definitions as d
-import itertools
-import numpy as np
 
 
 from metrics.coherence_metric import *
@@ -64,6 +63,7 @@ def update_dataframe(subreddit, model, date_range, num_topics):
     cache_df = cache_df.drop_duplicates()
     cache_df.to_csv(filepath, index=False)
     return
+
 
 #parameters
 
