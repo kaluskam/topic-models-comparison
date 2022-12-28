@@ -5,6 +5,7 @@ from psaw import PushshiftAPI
 import datetime as dt
 import warnings
 import definitions as d
+import threading
 
 warnings.filterwarnings('ignore')
 
@@ -15,6 +16,9 @@ class DataDownloader:
     """
     def __init__(self, verbose=False):
         self.verbose = verbose
+
+    def api_error(self):
+        raise Exception("Pushshift API connection timeout")
 
     def download_data(self, subreddit, start_date=d.START_DATE, end_date=d.END_DATE,
                       columns=None, saveas=False, return_df=True):
@@ -42,9 +46,15 @@ class DataDownloader:
 
         reddit = praw.Reddit(client_id='ha7wPvCUY_DurA', #  H_e4xc9p7tEXUoYj7BjLrw kZUFktG61cWUzjP6CbX1dg
                              client_secret='B98E34rnXS-Qw6Fg4eOwHUpIupQ', #  -f0UwwoDqiODOZhhx48WuJG_tCKOCg FsBhq-JaYn79pFhMOiOtW8FGwoQN7A
-                             user_agent='aita_scrapper' # aita_scrapper news_scrapper_app
+                             user_agent='aita_scrapper'# aita_scrapper news_scrapper_app
                              )
+
+        wait = 30
+        alarm = threading.Timer(wait, self.api_error)
+        alarm.start()
         api = PushshiftAPI(reddit)
+        alarm.cancel()
+
         rem_or_del = ['[removed]', '[deleted]']
         start_date = pd.to_datetime(start_date)
         end_date = pd.to_datetime(end_date)
