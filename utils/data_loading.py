@@ -44,7 +44,7 @@ def load_downloaded_data(subreddits, date_range):
     return input_data
 
 
-def create_output_data_cache_filepath(subreddit, date_range, model_alias):
+def create_output_data_cache_filepath(subreddit, date_range, model_alias, topics=10):
     """
     Create an absolute path to the model output file by combining subreddit, date_range and model name
 
@@ -56,16 +56,18 @@ def create_output_data_cache_filepath(subreddit, date_range, model_alias):
         indicates the first and the last date of a period to be saved as a cache file
     model_alias: str
         name of the model (lda, nmf, bertopic)
+    topics: int
+        number of topics, on which the model the model has been trained
 
     Returns
     -------
     filepath : str
         absolute path used to save the model output
     """
-    filename = str(subreddit) + '&' + str(date_range[0]) + '_' + str(date_range[1]) + '&'+ str(model_alias) +'.obj'
+    filename = str(subreddit) + '&' + str(date_range[0]) + '_' + str(date_range[1]) + '&'+ str(model_alias) + '&' + str(topics) + '.obj'
     return os.path.join(d.CACHE_DIR, filename)
 
-def check_cache_existance(subreddit, date_range, model_alias):
+def check_cache_existance(subreddit, date_range, model_alias, topics=10):
     """
     Check if cache file for given parameters exists (model output obtained from a given subreddit, date_range and model)
 
@@ -77,6 +79,8 @@ def check_cache_existance(subreddit, date_range, model_alias):
         the first and the last date of a posts creation period to be saved as a cache file
     model_alias: str
         name of the model (lda, nmf, bertopic)
+    topics: int
+        number of topics, on which the model the model has been trained
 
     Returns
     -------
@@ -84,7 +88,11 @@ def check_cache_existance(subreddit, date_range, model_alias):
         whether the specified model has been already saved after training on a given subreddit for a chosen date range
     """
     cached_df = pd.read_csv(os.path.join(d.CACHE_DIR, 'cached_files.csv'))
-    return not cached_df.loc[(cached_df['subreddit'] == subreddit) & (cached_df['date_range_0'] == date_range[0]) & (cached_df['date_range_1'] == date_range[1]) & (cached_df['model'] == model_alias), :].empty
+    print("Without topics filter:", cached_df.loc[(cached_df['subreddit'] == subreddit) & (
+                cached_df['date_range_0'] == date_range[0]) & (cached_df['date_range_1'] == date_range[1]) & (
+                                                           cached_df['model'] == model_alias), :])
+    print("With topics filter:", cached_df.loc[(cached_df['subreddit'] == subreddit) & (cached_df['date_range_0'] == date_range[0]) & (cached_df['date_range_1'] == date_range[1]) & (cached_df['model'] == model_alias) & (cached_df['topics'] == int(topics)), :])
+    return not cached_df.loc[(cached_df['subreddit'] == subreddit) & (cached_df['date_range_0'] == date_range[0]) & (cached_df['date_range_1'] == date_range[1]) & (cached_df['model'] == model_alias) & (cached_df['topics'] == int(topics)), :].empty
 
 
 def load_cache_output_data(filepath):

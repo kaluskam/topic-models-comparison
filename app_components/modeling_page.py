@@ -216,14 +216,14 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
         model = MODEL_NAMES_DICT[topic_model]
 
         ## MACRO
-        if len(subreddits) == 1 and int(n_topics_macro)==10:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
-            if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
-                output = load_cache_output_data(cache_file)
+        if check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro) and len(subreddits)==1:
+            cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro)
+            output = load_cache_output_data(cache_file)
+            print("Topic analysis macro from cache")
         else:
             model.fit(input_data, int(n_topics_macro))
             output = model.get_output()
+            print("Topic analysis macro not from cache")
 
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
@@ -235,14 +235,14 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             input_data, output, 'Topics similarity macro')
 
         ## MICRO
-        if len(subreddits) == 1 and int(n_topics_micro)==10:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model)
-            if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model)
-                output = load_cache_output_data(cache_file)
+        if check_cache_existance(subreddits[0], date_range, topic_model, n_topics_micro) and len(subreddits)==1:
+            cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro)
+            output = load_cache_output_data(cache_file)
+            print("Topic analysis micro from cache")
         else:
             model.fit(input_data, int(n_topics_micro))
             output = model.get_output()
+            print("Topic analysis micro not from cache")
 
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
