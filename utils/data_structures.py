@@ -51,6 +51,7 @@ class OutputData:
         self.topics_dict = {}
         self.n_topics = 0
         self.topic_word_matrix = []
+        self.metrics_dict = {}
 
     def add_topic(self, words, word_scores, frequency, name=""):
         """
@@ -121,6 +122,19 @@ class OutputData:
             all_probs.append(probs)
         topics_word_matrix = np.array(all_probs).astype(float)
         return topics_word_matrix
+
+    def calculate_metrics(self, metrics_list):
+        """
+        Calculate metrics necessary to be displayed on the evaluation page
+
+        Parameters
+        ----------
+        metrics_list: list of Metric objects
+            metrics to be calculated
+        """
+        for metric in metrics_list:
+            metrics_result = metric.evaluate(self.documents, self)
+            self.metrics_dict[metric.name] = metrics_result
 
     def save(self, filepath):
         """
