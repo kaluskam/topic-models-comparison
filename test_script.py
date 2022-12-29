@@ -69,7 +69,7 @@ def update_dataframe(subreddit, model, date_range, num_topics):
 #parameters
 
 models = [LDAModel(), NMFModel(), BERTopicModel()]
-subreddits = ['worldnews', 'netflix']
+subreddits = ['news', 'recipes', 'politics', 'books']
 date_ranges = [[dt.date(2021, 10, 1), dt.date(2022, 9, 30)], [dt.date(2019, 10, 1), dt.date(2022, 9, 30)]]
 
 prepare_cache_output(models, subreddits, date_ranges, num_topics = 20)

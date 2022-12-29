@@ -218,11 +218,15 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MACRO
         if len(subreddits) == 1:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro)
+            n_topics_macro_to_pass = str(n_topics_macro) if topic_model != "bertopic" else "None"
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
             if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro)
+                print("Macro was cached")
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
                 output = load_cache_output_data(cache_file)
             else:
+                print("Macro was not cached")
+                print(f"This path was not found {create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)}")
                 model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
                 model.fit(input_data, model_topics)
                 output = model.get_output()
@@ -233,8 +237,11 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
 
         texts_topics_df = output.texts_topics
+        print(texts_topics_df)
+        print(input_data.df)
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
+        print(r)
         fig_macro = visualise_topics_overtime(r, 'date', output,
                                               'Topics over time macro',
                                               time_interval_unit)
@@ -243,19 +250,23 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MICRO
         if len(subreddits) == 1:
-            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro)
+            n_topics_micro_to_pass = str(n_topics_micro) if topic_model != "bertopic" else "None"
+            cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
             if cache_exists:
-                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro)
+                print("Micro was cached")
+                cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
                 output = load_cache_output_data(cache_file)
             else:
+                print("Micro was not cached")
+                print(f"This path was not found {create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)}")
                 model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
                 model.fit(input_data, model_topics)
                 output = model.get_output()
         else:
+            print("Micro was not cached")
             model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
             model.fit(input_data, model_topics)
             output = model.get_output()
-            print("Topic analysis micro not from cache")
 
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,

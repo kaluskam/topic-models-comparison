@@ -159,7 +159,7 @@ def visualise_topics_overtime(df, date_column, outputdata, title, interval='mont
         ticktext = df_vis['x_axis_date']
 
     df_vis['topic'] = df_vis['topic_id'].apply(lambda topic_id: ' '.join(
-        outputdata.topics[topic_id].get_words()))
+        outputdata.topics[topic_id].get_words()) if len(outputdata.topics) > topic_id and topic_id >= 0 else "")
 
     fig = px.line(df_vis, x='x_axis_date', y='counts', color='topic', markers=True,
                   labels={
