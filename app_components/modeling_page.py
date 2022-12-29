@@ -218,7 +218,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MACRO
         if len(subreddits) == 1:
-            n_topics_macro_to_pass = str(n_topics_macro) if topic_model != "bertopic" else "None"
+            n_topics_macro_to_pass = str(n_topics_macro) #if topic_model != "bertopic" else "None"
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
             if cache_exists:
                 print("Macro was cached")
@@ -250,7 +250,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MICRO
         if len(subreddits) == 1:
-            n_topics_micro_to_pass = str(n_topics_micro) if topic_model != "bertopic" else "None"
+            n_topics_micro_to_pass = str(n_topics_micro) #if topic_model != "bertopic" else "None"
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
             if cache_exists:
                 print("Micro was cached")
@@ -268,6 +268,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             model.fit(input_data, model_topics)
             output = model.get_output()
 
+        print(output.n_topics)
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
