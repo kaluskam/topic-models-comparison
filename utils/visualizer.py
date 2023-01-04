@@ -56,6 +56,8 @@ class Visualizer:
         topics = [topic.words for topic in outputData.topics]
         topic_names = [i for i in range(outputData.n_topics)]
         frequencies = [topic.frequency for topic in outputData.topics]
+        max_freq = max(frequencies)/100
+        frequencies = list(map(lambda x: x if x>max_freq else max_freq, frequencies)) #make all circles visible
         texts = [' '.join(topic.words[0:5]) for topic in outputData.topics]
         embeddings = self.tfidf.transform(topics).toarray()
         embeddings = MinMaxScaler().fit_transform(embeddings)
@@ -87,6 +89,7 @@ class Visualizer:
         self.parameters = {"tfidf": {'preprocessor': ' '.join},
                            "umap": {"n_neighbors": 2,
                                     "n_components": 2,
+                                    "min_dist": 0.99,
                                     "metric": "hellinger",
                                     "random_state": 123}}
 
@@ -315,5 +318,6 @@ def plot_word_count_distribution(df, column='raw_text'):
     fig = px.histogram(a, title='Posts word count distribution')
     fig.update_layout(
         plot_bgcolor='rgba(237, 250, 253, 0.5)',
-        font=FONT)
+        font=FONT,
+        showlegend=False)
     return fig
