@@ -63,6 +63,8 @@ class Visualizer:
         topics = [topic.words for topic in outputData.topics]
         topic_names = [i for i in range(outputData.n_topics)]
         frequencies = [topic.frequency for topic in outputData.topics]
+        max_freq = max(frequencies)/100
+        frequencies = list(map(lambda x: x if x>max_freq else max_freq, frequencies)) #make all circles visible
         texts = [' '.join(topic.words[0:5]) for topic in outputData.topics]
         embeddings = self.tfidf.transform(topics).toarray()
         embeddings = MinMaxScaler().fit_transform(embeddings)
@@ -94,6 +96,7 @@ class Visualizer:
         self.parameters = {"tfidf": {'preprocessor': ' '.join},
                            "umap": {"n_neighbors": 2,
                                     "n_components": 2,
+                                    "min_dist": 0.99,
                                     "metric": "hellinger",
                                     "random_state": 123}}
 
@@ -322,7 +325,8 @@ def plot_word_count_distribution(df, column='raw_text'):
     fig = px.histogram(a, title='Posts word count distribution')
     fig.update_layout(
         plot_bgcolor='rgba(237, 250, 253, 0.5)',
-        font=FONT)
+        font=FONT,
+        showlegend=False)
     return fig
 
 
@@ -373,3 +377,76 @@ def plot_topic_overtime_vs_google_trends(output_data, topic_id, input_data, goog
 
     fig.tight_layout()
     plt.savefig(os.path.join(d.EXPERIMENTS_DIR, 'images', filename), dpi=300)
+
+
+def plot_topics_overtime_comparison(dataframe, date_column, outputdata, indices, title, filename, interval='month',
+                            models=['LDA', 'NMF', 'BERTopic'], default_legend=True):
+    fig, ax = plt.subplots(1, figsize=(9, 4.8))
+    colors = ['#219EBC', '#E63946', 'green']
+
+    for i in range(len(indices)):
+
+        df = pd.merge(dataframe.df, outputdata[i].texts_topics, left_index=True,
+                      right_on='text_id')
+        xaxis_title = ''
+        if interval == 'year':
+            df['year'] = df[date_column].apply(
+                lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+            df_vis = df.groupby(['year', 'topic_id']).size().reset_index(
+                name='counts')
+            df_vis['x_axis_date'] = df_vis['year']
+            xaxis_title = 'Year'
+
+
+        elif interval == 'month':
+            df['month'] = df[date_column].apply(
+                lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
+            df['year'] = df[date_column].apply(
+                lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+            df_vis = df.groupby(['year', 'month', 'topic_id']).size().reset_index(
+                name='counts')
+            df_vis['x_axis_date'] = df_vis.apply(lambda row: f'{row.year}-{row.month}',
+                                                 axis=1)
+            xaxis_title = 'Month'
+            df_vis = df_vis.loc[df_vis.topic_id == indices[i], :]
+            df_vis['x_axis_date'] = pd.to_datetime(df_vis['x_axis_date'])
+
+        elif interval == 'week':
+            df['week'] = df[date_column].apply(
+                lambda date: dt.datetime.strptime(date, "%Y-%m-%d").isocalendar().week)
+            df['year'] = df[date_column].apply(
+                lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+            df_vis = df.groupby(['year', 'week', 'topic_id']).size().reset_index(
+                name='counts')
+            df_vis['x_axis_date'] = df_vis.apply(
+                lambda row: f'Week {row.week}, {row.year}',
+                axis=1)
+            xaxis_title = 'Week'
+            df_vis['x_axis_date'] = pd.to_datetime(df_vis.week.astype(str) +
+                                                   df_vis.year.astype(str).add('-1'), format='%V%G-%u')
+
+        elif interval == 'day':
+            df_vis = df.groupby([date_column, 'topic_id']).size().reset_index(
+                name='counts')
+            df_vis['x_axis_date'] = df_vis[date_column]
+            xaxis_title = 'Day'
+            df_vis['x_axis_date'] = pd.to_datetime(df_vis['x_axis_date'])
+
+        df_vis['topic'] = df_vis['topic_id'].apply(lambda topic_id: ' '.join(
+            outputdata[i].topics[topic_id].get_words()) if len(
+            outputdata[i].topics) > topic_id and topic_id >= 0 else "")
+        df_vis['model'] = models[i]
+        df_vis = df_vis.loc[df_vis.topic_id == indices[i], :]
+        if default_legend:
+            plt.plot(df_vis['x_axis_date'], df_vis['counts'], label=models[i], color=colors[i])
+            plt.legend(loc='upper right')
+        else:
+            plt.plot(df_vis['x_axis_date'], df_vis['counts'], label=models[i] + " keywords: " + df_vis['topic'].iloc[0],
+                     color=colors[i])
+            plt.legend(loc='lower left', bbox_to_anchor=(-0.03, -0.35))
+        plt.title(title, size=16)
+
+        plt.ylabel('Count')
+        plt.savefig(os.path.join(d.EXPERIMENTS_DIR, 'images', filename), dpi=300)
+
+    return fig
