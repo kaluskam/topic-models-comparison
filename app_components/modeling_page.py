@@ -218,68 +218,66 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MACRO
         if len(subreddits) == 1:
-            n_topics_macro_to_pass = str(n_topics_macro) #if topic_model != "bertopic" else "None"
+            n_topics_macro_to_pass = str(n_topics_macro) if topic_model != "bertopic" else "None"
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
             if cache_exists:
                 print("Macro was cached")
                 cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
-                output = load_cache_output_data(cache_file)
+                output_data = load_cache_output_data(cache_file)
             else:
                 print("Macro was not cached")
                 print(f"This path was not found {create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)}")
                 model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
                 model.fit(input_data, model_topics)
-                output = model.get_output()
+                output_data = model.get_output()
         else:
                 model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
                 model.fit(input_data, model_topics)
-                output = model.get_output()
+                output_data = model.get_output()
 
 
-        texts_topics_df = output.texts_topics
-        print(texts_topics_df)
-        print(input_data.df)
+        texts_topics_df = output_data.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
-        print(r)
-        fig_macro = visualise_topics_overtime(r, 'date', output,
+        fig_macro = visualise_topics_overtime(r, 'date', output_data,
                                               'Topics over time macro',
                                               time_interval_unit)
         fig_topic_similarity_macro = vs.visualize_topics_in_documents(
-            input_data, output, 'Topics similarity macro')
+            input_data, output_data, 'Topics similarity macro')
 
         ## MICRO
         if len(subreddits) == 1:
-            n_topics_micro_to_pass = str(n_topics_micro) #if topic_model != "bertopic" else "None"
+            n_topics_micro_to_pass = str(n_topics_micro) if topic_model != "bertopic" else "None"
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
             if cache_exists:
                 print("Micro was cached")
                 cache_file = create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
-                output = load_cache_output_data(cache_file)
+                output_data = load_cache_output_data(cache_file)
             else:
                 print("Micro was not cached")
                 print(f"This path was not found {create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)}")
                 model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
                 model.fit(input_data, model_topics)
-                output = model.get_output()
+                output_data = model.get_output()
         else:
             print("Micro was not cached")
             model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
             model.fit(input_data, model_topics)
-            output = model.get_output()
+            output_data = model.get_output()
 
-        print(output.n_topics)
-        texts_topics_df = output.texts_topics
+        texts_topics_df = output_data.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
-        fig_micro = visualise_topics_overtime(r, 'date', output,
+
+        fig_micro = visualise_topics_overtime(r, 'date', output_data,
                                               'Topics over time micro',
                                               time_interval_unit)
-        fig_topic_similarity_micro = vs.visualize_topics_in_documents(
-            input_data, output, 'Topics similarity micro')
+        # fig_topic_similarity_micro = vs.visualize_topics_in_documents(
+        #     input_data, output_data, 'Topics similarity micro')
+
 
         return 0, wc, fig_macro, fig_micro, fig_topic_similarity_macro, \
-               fig_topic_similarity_micro, subreddits, topic_model, \
+               None, subreddits, topic_model, \
                n_topics_macro, date_range, True
 
     else:

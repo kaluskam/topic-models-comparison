@@ -42,7 +42,7 @@ def prepare_cache_output(models, subreddits, date_ranges, num_topics):
                 input_data = load_downloaded_data([subreddit], date_range)
                 model.fit(input_data, num_topics)
                 output = model.get_output()
-                model_alias = str(model).split('.')[2].split('Model')[0].lower()
+                model_alias = str(model).split('.')[2].split('Model')[0].lower() + "2"
                 num_topics_upd = "None" if model_alias == "bertopic" else num_topics
                 filepath = create_output_data_cache_filepath(subreddit, date_range, model_alias, num_topics_upd)
                 print("calculating metrics")
@@ -66,9 +66,18 @@ def update_dataframe(subreddit, model, date_range, num_topics):
 
 
 #parameters
+clusterer = hdbscan.HDBSCAN(algorithm='best', approx_min_span_tree=True,
+                                    gen_min_span_tree=False, leaf_size=30, metric='euclidean', min_cluster_size=1000,
+                                    min_samples=20, cluster_selection_epsilon=0.2, p=None)
+parameters = {"bertopic": {"n_gram_range": (1, 1),
+                                "top_n_words": 10,
+                                "language": "english",
+                                "hdbscan_model": clusterer,
+                                #"min_topic_size": 100,
+                                "nr_topics": 20}}
 
-models = [LDAModel(), NMFModel(), BERTopicModel()]
-subreddits = ['science']
-date_ranges = [[dt.date(2021, 10, 1), dt.date(2022, 9, 30)], [dt.date(2019, 10, 1), dt.date(2022, 9, 30)]]
+models = [BERTopicModel(parameters=parameters)]
+subreddits = ['worldnews']
+date_ranges = [[dt.date(2019, 10, 1), dt.date(2022, 9, 30)]]
 
-prepare_cache_output(models, subreddits, date_ranges, num_topics = 10)
+prepare_cache_output(models, subreddits, date_ranges, num_topics=20)

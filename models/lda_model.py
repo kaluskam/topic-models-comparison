@@ -61,6 +61,7 @@ class LDAModel(Model):
                                                "no_above": 0.1}, #0.4
                            "lda": {"num_topics": 10,
                                    "alpha": "auto",
-                                   "eval_every": 2}}
+                                   "eval_every": 2,
+                                   "passes": 70}}
     def save(self, filepath):
         super().save(filepath)

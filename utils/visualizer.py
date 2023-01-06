@@ -1,3 +1,4 @@
+import numpy as np
 import plotly.express as px
 import pandas as pd
 import datetime as dt
@@ -8,6 +9,12 @@ from wordcloud import WordCloud
 from collections import Counter
 import itertools
 import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import sys
+import numpy
+import os
+import definitions as d
+numpy.set_printoptions(threshold=sys.maxsize)
 
 FONT = dict(
             size=14,
@@ -91,7 +98,7 @@ class Visualizer:
                                     "random_state": 123}}
 
 
-def visualise_topics_overtime(df, date_column, outputdata, title, interval='month'):
+def visualise_topics_overtime(df, date_column, outputdata, title, interval='month', google_trends_df=None):
     """
         Method to visualize topics over time with a selected granularity.
 
@@ -317,3 +324,52 @@ def plot_word_count_distribution(df, column='raw_text'):
         plot_bgcolor='rgba(237, 250, 253, 0.5)',
         font=FONT)
     return fig
+
+
+def plot_topic_overtime_vs_google_trends(output_data, topic_id, input_data, google_trends_df, fig_title, filename):
+    texts_topics_df = output_data.texts_topics
+    df = pd.merge(input_data.df, texts_topics_df, left_index=True, right_on='text_id')
+    df = df[df['topic_id'] == topic_id]
+    df['month'] = df['date'].apply(
+        lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
+    df['year'] = df['date'].apply(
+        lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+    df_vis = df.groupby(['year', 'month', 'topic_id']).size().reset_index(
+        name='counts')
+    df_vis['x_axis_date'] = df_vis.apply(
+        lambda row: f'{row.year}-{row.month if row.month >= 10 else "0" + str(row.month)}-01', axis=1)
+    x_axis_data = df_vis['x_axis_date']
+    y1_axis_data = df_vis['counts']
+
+    google_trends_df['month'] = google_trends_df['date'].apply(
+        lambda date: dt.datetime.strptime(date, "%Y-%m-%d").month)
+    google_trends_df['year'] = google_trends_df['date'].apply(
+        lambda date: dt.datetime.strptime(date, "%Y-%m-%d").year)
+    google_trends_df['x_axis_date'] = google_trends_df.apply(
+        lambda row: f'{row.year}-{row.month if row.month >= 10 else "0" + str(row.month)}-01', axis=1)
+    google_trends_df['counts'] = google_trends_df['counts'].replace('<1', 0).astype(int)
+    y2_axis_data = google_trends_df[['x_axis_date', 'counts']].groupby(['x_axis_date']).sum()
+    print(x_axis_data)
+    x_axis_data = x_axis_data.apply(lambda x: np.datetime64(x))
+
+    fig, ax1 = plt.subplots()
+    fig.suptitle(fig_title, size=16)
+    ax1.set_title('Topic over time vs. Google Trends')
+    color1 = '#219EBC'
+    ax1.set_xlabel('Month')
+    ax1.set_ylabel('Number of posts', color=color1)
+    ax1.plot(x_axis_data, y1_axis_data, color=color1, linewidth=3)
+    ax1.tick_params(axis='y')
+    ax1.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%b'))
+
+    ax2 = plt.twinx(ax1)
+    color2 = '#E63946'
+    ax2.set_ylabel('Google trends score', color=color2)
+    ax2.plot(x_axis_data, y2_axis_data, color=color2, linewidth=3)
+    ax2.tick_params(axis='y')
+
+    for label in ax1.get_xticklabels(which='major'):
+        label.set(rotation=30, horizontalalignment='right')
+
+    fig.tight_layout()
+    plt.savefig(os.path.join(d.EXPERIMENTS_DIR, 'images', filename), dpi=300)
