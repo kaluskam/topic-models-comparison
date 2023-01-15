@@ -231,17 +231,15 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
                 model.fit(input_data, model_topics)
                 output = model.get_output()
         else:
+                print("Macro was not cached")
                 model_topics = int(n_topics_macro) if n_topics_macro is not None else 10
                 model.fit(input_data, model_topics)
                 output = model.get_output()
 
 
         texts_topics_df = output.texts_topics
-        print(texts_topics_df)
-        print(input_data.df)
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
-        print(r)
         fig_macro = visualise_topics_overtime(r, 'date', output,
                                               'Topics over time macro',
                                               time_interval_unit)
@@ -268,7 +266,6 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             model.fit(input_data, model_topics)
             output = model.get_output()
 
-        print(output.n_topics)
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')

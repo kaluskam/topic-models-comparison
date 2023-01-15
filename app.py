@@ -16,8 +16,6 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc_css],
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(
-            dbc.NavLink('Download subreddits', href='/download-subreddits')),
-        dbc.NavItem(
             dbc.NavLink('Modeling', href='/modeling')),
         dbc.NavItem(
             dbc.NavLink('Model comparison', href='/metrics')),
