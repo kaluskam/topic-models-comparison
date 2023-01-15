@@ -8,7 +8,7 @@ The files uploaded in the Diploma Theses Archive do not include, data, model and
 
 Diagram describing the solution:
 
-!["Graphical abstract of the solution"](assets\1-graphical-abstract.png)
+!["Graphical abstract of the solution"](./assets/1-graphical-abstract.png)
 
 Installation instructions:
 
