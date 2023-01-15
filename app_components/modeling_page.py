@@ -268,6 +268,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             model.fit(input_data, model_topics)
             output = model.get_output()
 
+        print(output.n_topics)
         texts_topics_df = output.texts_topics
         r = pd.merge(input_data.df, texts_topics_df, left_index=True,
                      right_on='text_id')
