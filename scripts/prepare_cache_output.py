@@ -43,12 +43,11 @@ def prepare_cache_output(models, subreddits, date_ranges, num_topics):
                 model.fit(input_data, num_topics)
                 output = model.get_output()
                 model_alias = str(model).split('.')[2].split('Model')[0].lower()
-                num_topics_upd = "None" if model_alias == "bertopic" else num_topics
-                filepath = create_output_data_cache_filepath(subreddit, date_range, model_alias, num_topics_upd)
+                filepath = create_output_data_cache_filepath(subreddit, date_range, model_alias, num_topics)
                 print("calculating metrics")
                 output.calculate_metrics(metrics)
                 output.save(filepath)
-                update_dataframe(subreddit, model_alias, date_range, num_topics_upd)
+                update_dataframe(subreddit, model_alias, date_range, num_topics)
     return
 
 

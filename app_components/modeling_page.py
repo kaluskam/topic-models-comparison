@@ -218,7 +218,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MACRO
         if len(subreddits) == 1:
-            n_topics_macro_to_pass = str(n_topics_macro) #if topic_model != "bertopic" else "None"
+            n_topics_macro_to_pass = str(n_topics_macro)
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_macro_to_pass)
             if cache_exists:
                 print("Macro was cached")
@@ -250,7 +250,7 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
 
         ## MICRO
         if len(subreddits) == 1:
-            n_topics_micro_to_pass = str(n_topics_micro) #if topic_model != "bertopic" else "None"
+            n_topics_micro_to_pass = str(n_topics_micro)
             cache_exists = check_cache_existance(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)
             if cache_exists:
                 print("Micro was cached")
@@ -259,12 +259,12 @@ def run_analysis(n_clicks, subreddits, topic_model, n_topics_macro,
             else:
                 print("Micro was not cached")
                 print(f"This path was not found {create_output_data_cache_filepath(subreddits[0], date_range, topic_model, n_topics_micro_to_pass)}")
-                model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
+                model_topics = int(n_topics_micro)
                 model.fit(input_data, model_topics)
                 output = model.get_output()
         else:
             print("Micro was not cached")
-            model_topics = int(n_topics_micro) if n_topics_micro is not None else 10
+            model_topics = int(n_topics_micro)
             model.fit(input_data, model_topics)
             output = model.get_output()
 

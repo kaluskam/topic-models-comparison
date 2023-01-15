@@ -115,7 +115,7 @@ model_order = []
 calculated_metrics = []
 for model_name, model in MODEL_NAMES_DICT.items():
     model_order.append(model_name)
-    num_topics_for_cache = str(number_topics) if model_name != "bertopic" else "None"
+    num_topics_for_cache = str(number_topics)
     if len(subreddits) == 1 and check_cache_existance(subreddits[0], date_range, model_name, num_topics_for_cache):
         cache_file = create_output_data_cache_filepath(subreddits[0], date_range, model_name, num_topics_for_cache)
         output = load_cache_output_data(cache_file)
@@ -190,7 +190,7 @@ def run_analysis(n_clicks, subreddits, n_topics, date_range):
         calculated_metrics = []
         for model_name, model in MODEL_NAMES_DICT.items():
             model_order.append(model_name)
-            num_topics_for_cache = str(n_topics) if model_name != "bertopic" else "None"
+            num_topics_for_cache = str(n_topics)
             if len(subreddits) == 1 and check_cache_existance(subreddits[0], date_range, model_name, num_topics_for_cache):
                 cache_file = create_output_data_cache_filepath(subreddits[0], date_range, model_name, num_topics_for_cache)
                 output = load_cache_output_data(cache_file)
