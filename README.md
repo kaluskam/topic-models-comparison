@@ -5,6 +5,7 @@ This repository contains the practical part of the Bachelor Thesis in the field 
 
 The files uploaded in the Diploma Theses Archive do not include, data, model and precached results. For this reason execution might be very slow. For testing it is recommended to download the repository with the cached files from [GitHub](https://github.com/kaluskam/topic-models-comparison).
 
+Information about the thesis is available here: [Topic analysis performed on data from Reddit](https://repo.pw.edu.pl/info/bachelor/WUT575a8545c3084dc18dda9b2223342532/Szczeg%25C3%25B3%25C5%2582y%2Brekordu%2B%25E2%2580%2593%2BPrace%2Bin%25C5%25BCynierskie%2B%2B%2Blicencjackie%2B%25E2%2580%2593%2BPolitechnika%2BWarszawska?r=supervisedwork&ps=20&tab=&lang=pl)
 
 Diagram describing the solution:
 
